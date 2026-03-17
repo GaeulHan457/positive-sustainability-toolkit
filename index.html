@@ -1,0 +1,3099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Positive Sustainability Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --bg-card: #ffffff;
+    --text-dark: #2d2a1e;
+    --text-mid: #5a5547;
+    --text-light: #8a8278;
+    --tag-wellbeing: #F4A1A8;
+    --tag-wellbeing-text: #7a3a40;
+    --tag-sustainability: #A8C5A0;
+    --tag-sustainability-text: #2e5a28;
+    --tag-neutral-bg: #ede9e1;
+    --tag-neutral-text: #5a5547;
+    --accent-green: #6b8f5e;
+    --accent-pink: #d4717a;
+    --border: #e0dbd0;
+    --card-section-bg: #f0ece4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+  nav.scrolled { border-bottom-color: var(--border); }
+  .nav-logo {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--accent-green);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    font-size: 14px;
+    color: var(--text-mid);
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text-dark); }
+
+  /* ─── PAGE VIEWS ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── HOME: HERO ─── */
+  .hero {
+    min-height: calc(50vh - 65px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 48px 32px;
+  }
+  .hero-tagline {
+    font-size: clamp(15px, 1.6vw, 20px);
+    font-weight: 400;
+    color: var(--text-dark);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    line-height: 1.7;
+    justify-content: center;
+  }
+  .search-trigger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+    display: inline-flex;
+    align-items: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .search-trigger-btn:hover { background: rgba(107,143,94,0.10); }
+  .search-trigger-btn:focus { outline: none; }
+  .search-trigger-btn:hover .search-icon { color: #6b8f5e; }
+  .search-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-light);
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  /* ─── DROPDOWN SYSTEM ─── */
+  .dd-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .dropdown-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 12px;
+    border-radius: 100px;
+    font-size: clamp(13px, 1.5vw, 18px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s;
+    border: 1.5px solid transparent;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .dropdown-tag:hover { opacity: 0.88; }
+  .dropdown-tag.open { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+  .dropdown-tag.neutral {
+    background: transparent;
+    border-color: var(--tag-neutral-text);
+    color: var(--tag-neutral-text);
+  }
+  .dropdown-tag.neutral.has-value {
+    background: var(--tag-neutral-bg);
+  }
+  .dropdown-tag.pink {
+    background: var(--tag-wellbeing);
+    color: var(--tag-wellbeing-text);
+    border-color: var(--tag-wellbeing);
+  }
+  .dropdown-tag.green {
+    background: var(--tag-sustainability);
+    color: var(--tag-sustainability-text);
+    border-color: var(--tag-sustainability);
+  }
+  .dropdown-tag svg {
+    width: 16px; height: 16px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .dropdown-tag.open svg { transform: rotate(180deg); }
+
+  /* Panel */
+  .dd-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 200px;
+    border-radius: 16px;
+    padding: 10px;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.2s, transform 0.2s;
+    font-family: 'DM Mono', 'Courier New', monospace;
+  }
+  .dd-panel.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  .dd-panel.neutral-panel {
+    background: #e8e4db;
+  }
+  .dd-panel.pink-panel {
+    background: #f8d0d4;
+  }
+  .dd-panel.green-panel {
+    background: #c8dfc0;
+  }
+
+  /* Main option (shown at top of panel, bold + colored bg) */
+  .dd-main-opt {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: clamp(14px, 1.5vw, 17px);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 6px;
+    transition: filter 0.15s;
+    font-family: inherit;
+  }
+  .dd-main-opt.pink-opt {
+    background: var(--tag-wellbeing);
+    color: var(--tag-wellbeing-text);
+  }
+  .dd-main-opt.green-opt {
+    background: var(--tag-sustainability);
+    color: var(--tag-sustainability-text);
+  }
+  .dd-main-opt:hover { filter: brightness(0.96); }
+
+  /* Sub options */
+  .dd-sub-opt {
+    display: block;
+    width: 100%;
+    padding: 7px 16px;
+    border-radius: 10px;
+    font-size: clamp(13px, 1.4vw, 16px);
+    font-weight: 400;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .dd-panel.neutral-panel .dd-sub-opt { color: var(--tag-neutral-text); }
+  .dd-panel.pink-panel .dd-sub-opt { color: var(--tag-wellbeing-text); }
+  .dd-panel.green-panel .dd-sub-opt { color: var(--tag-sustainability-text); }
+  .dd-panel.neutral-panel .dd-sub-opt:hover { background: rgba(0,0,0,0.06); }
+  .dd-panel.pink-panel .dd-sub-opt:hover { background: rgba(0,0,0,0.05); }
+  .dd-panel.green-panel .dd-sub-opt:hover { background: rgba(0,0,0,0.05); }
+  .dd-sub-opt.selected { font-weight: 600; }
+  .dd-main-opt.selected { filter: brightness(0.92); outline: 2px solid rgba(0,0,0,0.15); }
+
+  /* Divider inside panel */
+  .dd-divider {
+    height: 1px;
+    background: rgba(0,0,0,0.1);
+    margin: 6px 8px;
+  }
+
+  /* ─── CARDS STRIP ─── */
+  .cards-section {
+    background: #e8e4db;
+    padding: 48px 0 60px;
+  }
+  .cards-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+  .cards-track {
+    display: flex;
+    gap: 20px;
+    padding: 0 48px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .cards-track::-webkit-scrollbar { display: none; }
+  .practice-card {
+    flex-shrink: 0;
+    width: 300px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .practice-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+  .practice-card.active-card {
+    outline: 2px solid var(--accent-green);
+  }
+  .card-label {
+    padding: 16px 16px 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+    min-height: 72px;
+  }
+  .card-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--card-section-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    vertical-align: bottom;
+  }
+  .card-img-placeholder {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    background: var(--card-section-bg);
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .card-img-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    display: block;
+    vertical-align: bottom;
+  }
+
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: box-shadow 0.2s;
+  }
+  .scroll-btn:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .scroll-btn.left { left: 8px; }
+  .scroll-btn.right { right: 8px; }
+
+  .explore-more {
+    text-align: center;
+    margin-top: 36px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-mid);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+  .explore-more:hover { color: var(--text-dark); }
+
+  /* ─── HOME FULL GRID ─── */
+  .home-grid-section {
+    background: #fff;
+    padding: 60px 48px 80px;
+    border-top: 1px solid #e8e2d8;
+    display: none;
+  }
+  .home-grid-section.visible {
+    display: block;
+  }
+  .home-grid-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .home-grid-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .home-grid-count {
+    font-size: 13px;
+    color: var(--text-light);
+  }
+  .home-practice-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 1200px) { .home-practice-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 768px)  { .home-practice-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px)  { .home-practice-grid { grid-template-columns: repeat(2, 1fr); } }
+  .home-practice-card {
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #e8e2d8;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .home-practice-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+  }
+  .home-practice-card .card-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+  .home-practice-card .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+  .home-practice-card .card-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 10px 12px;
+    line-height: 1.4;
+  }
+  .home-practice-card .card-context {
+    font-size: 10px;
+    color: var(--text-light);
+    padding: 0 12px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }r: var(--text-dark); }
+  .explore-more svg { animation: bounce 1.8s infinite; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+  }
+
+  /* ─── DETAIL PAGE ─── */
+  .detail-page { padding: 0 48px 80px; position: relative; overflow: hidden; }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 0 24px;
+    font-size: 14px;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+  .back-btn:hover { color: var(--text-dark); }
+  .back-btn svg { width: 18px; height: 18px; }
+
+  .detail-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 400;
+    color: #2d2a1e;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 28px;
+    max-width: 700px;
+  }
+
+  .detail-body {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #5a5547;
+    max-width: 660px;
+    margin-bottom: 32px;
+  }
+
+  /* Tags */
+  .tags-section { margin-bottom: 24px; }
+  .tags-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+  }
+  .tags-wrap {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tags-wrap::-webkit-scrollbar { display: none; }
+  .tag {
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .tag.wellbeing {
+    background: var(--tag-wellbeing);
+    color: var(--tag-wellbeing-text);
+  }
+  .tag.sustainability {
+    background: var(--tag-sustainability);
+    color: var(--tag-sustainability-text);
+  }
+
+  /* Two-column layout: text + images */
+  .story-grid-placeholder {
+  @media (max-width: 768px) {
+    .story-grid { grid-template-columns: 1fr; }
+  }
+  .story-left h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-dark);
+  }
+  .ai-dive-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #5c3d1e !important;
+    background: #ede0d0 !important;
+    cursor: pointer;
+    margin-left: 0;
+    margin-top: 16px;
+    margin-bottom: 0;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    border: none;
+    outline: none;
+  }
+  .ai-dive-btn:hover { background: #dac9b2 !important; transform: translateY(-1px); }
+
+
+    font-size: 36px;
+  }
+
+  /* Effects cards */
+  .effects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 60px;
+    align-items: stretch;
+  }
+  @media (max-width: 768px) {
+    .effects-grid { grid-template-columns: 1fr; }
+  }
+  .effect-card {
+    background: var(--card-section-bg);
+    border-radius: 16px;
+    padding: 28px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .effect-card h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--text-dark);
+    white-space: nowrap;
+  }
+  .effect-card p, .effect-card ul {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-mid);
+    list-style: none;
+  }
+  .effect-card ul li {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .effect-card ul li::before {
+    content: "✳︎";
+    font-size: 11px;
+    margin-top: 3px;
+    color: var(--text-light);
+    flex-shrink: 0;
+  }
+
+  /* Related practices */
+  .related-section h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text-dark);
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 260px));
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    .related-grid { grid-template-columns: 1fr; }
+  }
+  .related-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .related-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .related-card-label {
+    padding: 14px 16px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+    min-height: 60px;
+  }
+  .related-card-img {
+    width: 100%;
+    height: 280px;
+    background: var(--card-section-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    overflow: hidden;
+  }
+  .related-card-img img {
+    width: 115%;
+    height: 118%;
+    object-fit: cover;
+    object-position: center bottom;
+    display: block;
+    vertical-align: bottom;
+  }
+
+  /* Emotions */
+  .emotion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: white;
+    border: 1.5px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-mid);
+    margin: 3px;
+  }
+
+  /* Separator */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* ─── HOW TO USE PAGE ─── */
+  #howToUsePage { background: var(--bg); min-height: 100vh; }
+
+  .htu-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+
+  .htu-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-dark);
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  /* Accordion */
+  .accordion {
+    border-top: 1px solid var(--border);
+  }
+
+  .acc-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .acc-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 26px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(15px, 1.6vw, 19px);
+    font-weight: 600;
+    color: var(--text-dark);
+    text-align: left;
+    transition: color 0.2s;
+  }
+  .acc-trigger:hover { color: var(--accent-green); }
+
+  /* Plus/X icon */
+  .acc-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    margin-left: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #c5bdb4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .acc-item.open .acc-icon {
+    background: var(--text-dark);
+    border-color: var(--text-dark);
+  }
+  /* Horizontal bar always visible */
+  .acc-icon::before {
+    content: '';
+    position: absolute;
+    width: 12px; height: 2px;
+    background: #6b635a;
+    border-radius: 2px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: background 0.2s;
+  }
+  /* Vertical bar: visible when closed, hidden when open */
+  .acc-icon::after {
+    content: '';
+    position: absolute;
+    width: 2px; height: 12px;
+    background: #6b635a;
+    border-radius: 2px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s, background 0.2s;
+    opacity: 1;
+  }
+  .acc-item.open .acc-icon::before { background: #fff; }
+  .acc-item.open .acc-icon::after  { opacity: 0; }
+
+  /* Content panel */
+  .acc-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .acc-item.open .acc-body {
+    grid-template-rows: 1fr;
+  }
+  .acc-inner {
+    overflow: hidden;
+  }
+
+  /* Two-column layout inside accordion */
+  .acc-content {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px 60px;
+    padding-bottom: 40px;
+  }
+  @media (max-width: 680px) {
+    .acc-content { grid-template-columns: 1fr; }
+    .acc-left { display: none; }
+  }
+  .acc-left {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4px;
+  }
+  .acc-left-img {
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--card-section-bg);
+  }
+  .acc-left-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .acc-right {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--text-mid);
+  }
+  .acc-right p { margin-bottom: 14px; }
+  .acc-right h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 20px 0 12px;
+  }
+  .acc-right h5 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+
+  /* Info box (beige card) */
+  .info-box {
+    background: var(--card-section-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-mid);
+  }
+  .info-box strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  /* Highlighted box (for "who can benefit" / step cards) */
+  .highlight-box {
+    background: var(--card-section-bg);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .highlight-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .highlight-box ul li {
+    padding: 4px 0 4px 16px;
+    position: relative;
+    font-size: 14px;
+    color: var(--text-mid);
+  }
+  .highlight-box ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+  }
+
+  /* Step card */
+  .step-card {
+    background: var(--card-section-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .step-card h5 { color: var(--accent-green); margin-bottom: 6px; }
+
+  /* Illustration in accordion */
+  .acc-illus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+    margin: 20px 0 10px;
+  }
+
+  /* ─── FOOTER / SHARE SECTION ─── */
+  .share-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 60px auto 0;
+    padding: 60px 48px 80px;
+  }
+  @media (max-width: 680px) {
+    .share-section { grid-template-columns: 1fr; }
+  }
+  .share-illus {
+    font-size: 120px;
+    text-align: center;
+  }
+  .share-text h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+  }
+  .share-text p {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--text-mid);
+    margin-bottom: 14px;
+  }
+  .share-text a {
+    color: var(--accent-green);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ─── EXPLORE VIEW ─── */
+  #explorePage { background: var(--bg); }
+
+  .explore-header {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    background: var(--bg);
+    padding: 18px 48px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .explore-tagline {
+    font-size: clamp(13px, 1.4vw, 16px);
+    font-weight: 400;
+    color: var(--text-dark);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    line-height: 1.6;
+  }
+  .explore-tagline .search-icon {
+    width: 16px; height: 16px;
+  }
+  .explore-tagline .dropdown-tag {
+    font-size: clamp(12px, 1.3vw, 15px);
+    padding: 2px 11px;
+  }
+  .explore-tagline .dropdown-tag svg {
+    width: 13px; height: 13px;
+  }
+
+  .explore-grid-wrap {
+    padding: 36px 48px 80px;
+  }
+  .explore-count {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    font-weight: 400;
+  }
+  .explore-grid {
+    display: grid;
+    grid-template-columns: repeat(4, calc(25% - 18px));
+    gap: 20px;
+    justify-content: center;
+  }
+  @media (max-width: 1100px) { .explore-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px)  { .explore-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px)  { .explore-grid { grid-template-columns: 1fr; } }
+
+  .explore-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.22s, box-shadow 0.22s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .explore-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.11);
+  }
+  .explore-card-label {
+    padding: 14px 16px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+    min-height: 58px;
+  }
+  .explore-card-img {
+    width: 100%;
+    height: 280px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 44px;
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0 0 14px 14px;
+    background: #ffffff !important;
+  }
+  .explore-card-img img { width: 110%; height: 110%; object-fit: contain; object-position: center bottom; display: block; vertical-align: bottom; }
+
+  /* placeholder cards (P005–P024, data not loaded) */
+  .explore-card.placeholder { opacity: 0.6; cursor: default; }
+  .explore-card.placeholder:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+  /* ─── ABOUT PAGE ─── */
+  #aboutPage { background: var(--bg); min-height: 100vh; }
+
+  .about-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+
+  .about-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-dark);
+    margin-bottom: 48px;
+    text-transform: uppercase;
+  }
+
+  /* Hero intro two-column */
+  .about-intro {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px 60px;
+    align-items: start;
+    margin-bottom: 52px;
+  }
+  @media (max-width: 768px) { .about-intro { grid-template-columns: 1fr; } }
+
+  .about-intro-text h2 {
+    font-size: clamp(16px, 1.8vw, 20px);
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .about-intro-text h3 {
+    font-size: clamp(15px, 1.6vw, 18px);
+    font-weight: 400;
+    color: var(--text-dark);
+    margin-bottom: 24px;
+  }
+  .about-intro-text p {
+    font-size: 14.5px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    margin-bottom: 14px;
+  }
+  .about-intro-illus {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+    font-size: 100px;
+  }
+
+  /* About accordion (reuses same .accordion / .acc-item classes) */
+  /* ─ no extra classes needed, we just reuse them ─ */
+
+  /* Two-column content layout used inside about accordion */
+  .about-acc-body {
+    padding: 0 0 36px;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--text-mid);
+  }
+  .about-acc-body p { margin-bottom: 12px; }
+  .about-acc-body h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 18px 0 10px;
+  }
+
+  /* Beige content box for about sections */
+  .about-content-box {
+    background: var(--card-section-bg);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-mid);
+  }
+  .about-content-box p { margin-bottom: 10px; }
+  .about-content-box p:last-child { margin-bottom: 0; }
+  .about-content-box ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+  .about-content-box ul li {
+    padding: 3px 0 3px 16px;
+    position: relative;
+  }
+  .about-content-box ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+  }
+  .about-content-box strong { color: var(--text-dark); font-weight: 700; }
+
+  /* About two-col accordion layout (text + illustration side by side) */
+  .about-acc-grid {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    column-gap: 48px;
+    row-gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 768px) { .about-acc-grid { grid-template-columns: 1fr; } }
+  .about-acc-illus {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: 80px;
+    padding-top: 4px;
+  }
+
+  /* Credit grid (2×2) */
+  .credit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 20px 0;
+  }
+  @media (max-width: 520px) { .credit-grid { grid-template-columns: 1fr; } }
+  .credit-card {
+    background: var(--card-section-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text-mid);
+  }
+  .credit-card strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-green);
+    margin-bottom: 6px;
+  }
+  .credit-card ul { list-style: none; padding: 0; }
+  .credit-card ul li { padding: 1px 0; }
+
+  /* Share section on About page */
+  .about-share {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 60px auto 0;
+    padding: 60px 48px 60px;
+  }
+  @media (max-width: 768px) { .about-share { grid-template-columns: 1fr; } }
+  .about-share-text {
+    grid-column: 1 / 3;
+  }
+  .about-share-text h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+  }
+  .about-share-text p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+  }
+  .about-share-text a {
+    color: var(--accent-green);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .about-share-illus {
+    display: flex;
+    justify-content: center;
+    font-size: 80px;
+  }
+
+  /* FAQ section */
+  .faq-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+    border-top: 1px solid var(--border);
+    padding-top: 60px;
+  }
+  .faq-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-dark);
+    margin-bottom: 36px;
+    text-transform: uppercase;
+  }
+  /* FAQ reuses .accordion / .acc-item classes */
+  /* Slightly smaller trigger text for FAQ */
+  .faq-section .acc-trigger {
+    font-size: clamp(13.5px, 1.4vw, 16px);
+    font-weight: 600;
+  }
+
+
+
+
+  @keyframes searchGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(107,143,94,0); }
+    50% { box-shadow: 0 0 0 8px rgba(107,143,94,0.3); }
+  }
+  .search-trigger-btn.all-selected {
+    animation: searchGlow 1.4s ease-in-out infinite;
+    background: rgba(107,143,94,0.12);
+    border-radius: 50%;
+  }
+  .search-trigger-btn.all-selected .search-icon { color: #6b8f5e; }
+
+
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 48px;
+    overflow: visible;
+  }
+  .detail-left-col { min-width: 0; overflow: hidden; max-width: 100%; }
+  .detail-right-col {
+    position: sticky;
+    top: 65px;
+    height: calc(100vh - 65px);
+    overflow: hidden;
+    margin-right: -48px;
+    width: 744px;px;
+  }
+  .story-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    column-gap: 12px;
+    row-gap: 14px;
+    width: 100%;
+    height: 100%;
+    padding: 0 3px 3px 0;
+    box-sizing: border-box;
+  }
+  .story-img-box {
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--card-section-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+  }
+  .story-img-box img {
+    width: 107%;
+    height: 107%;
+    object-fit: contain;
+    object-position: center center;
+  }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    width: 70%;
+  }
+
+  .story-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    width: 100%;
+    gap: 16px;
+  }
+  .story-header h3 {
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .story-text {
+    font-size: 15px;
+    line-height: 2.0;
+    color: #6b6560;
+    clear: both;
+    width: 100%;
+  }
+  .detail-top-left { padding-top: 0; padding-bottom: 0; }
+  @media (max-width: 768px) {
+    .detail-layout { grid-template-columns: 1fr; }
+    .detail-right-col { position: static; }
+  }
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 0;
+    margin-bottom: 48px;
+    align-items: start;
+  }to;
+  }
+  @media (max-width: 768px) {
+    .detail-top-grid { grid-template-columns: 1fr; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo" onclick="goHome()">Positive Sustainability Toolkit</div>
+  <div class="nav-links">
+    <a href="#" onclick="showHowToUse(); return false;">How to use</a>
+    <a href="#" onclick="showAbout(); return false;">About</a>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="homePage" class="page active">
+  <div class="hero">
+    <div class="hero-tagline">
+      <button class="search-trigger-btn" onclick="runHeroFilter()" title="Search practices">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      How can we design
+
+      <!-- POSITIVE EVERYDAY dropdown (pink) -->
+      <div class="dd-wrap" id="ddWrapEveryday">
+        <span class="dropdown-tag pink" id="ddBtnEveryday" onclick="toggleDropdown('everyday')">
+          <span id="ddLabelEveryday">positive everyday</span>
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+        <div class="dd-panel pink-panel" id="ddPanelEveryday">
+          <button class="dd-main-opt pink-opt" onclick="selectOption('everyday','positive everyday')">positive everyday</button>
+          <div class="dd-divider"></div>
+          <button class="dd-sub-opt" onclick="selectOption('everyday','positive cooking')">positive cooking</button>
+          <button class="dd-sub-opt" onclick="selectOption('everyday','positive cleaning')">positive cleaning</button>
+          <button class="dd-sub-opt" onclick="selectOption('everyday','positive clothing care')">positive clothing care</button>
+          <button class="dd-sub-opt" onclick="selectOption('everyday','positive personal care')">positive personal care</button>
+          <button class="dd-sub-opt" onclick="selectOption('everyday','positive indoor air care')">positive indoor air care</button>
+        </div>
+      </div>
+
+      experiences that are
+
+      <!-- RESPONSIBLE dropdown (green) -->
+      <div class="dd-wrap" id="ddWrapAct">
+        <span class="dropdown-tag green" id="ddBtnAct" onclick="toggleDropdown('act')">
+          <span id="ddLabelAct">responsible</span>
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+        <div class="dd-panel green-panel" id="ddPanelAct">
+          <button class="dd-main-opt green-opt" onclick="selectOption('act','responsible')">responsible</button>
+          <div class="dd-divider"></div>
+          <button class="dd-sub-opt" onclick="selectOption('act','frugal')">frugal</button>
+          <button class="dd-sub-opt" onclick="selectOption('act','pro-ecological')">pro-ecological</button>
+          <button class="dd-sub-opt" onclick="selectOption('act','altruistic')">altruistic</button>
+          <button class="dd-sub-opt" onclick="selectOption('act','equitable')">equitable</button>
+        </div>
+      </div>
+      ?
+    </div>
+  </div>
+
+  <div class="cards-section">
+    <div class="cards-wrapper">
+      <button class="scroll-btn left" onclick="scrollCards(-1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5a5547" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="cards-track" id="cardsTrack">
+        <!-- Cards will be injected by JS -->
+      </div>
+      <button class="scroll-btn right" onclick="scrollCards(1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5a5547" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="explore-more" id="exploreAllBtn" onclick="toggleHomeGrid()">
+      Explore All 24 Practices
+      <svg id="exploreAllArrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
+
+  <!-- HOME FULL GRID -->
+  <div class="home-grid-section" id="homeGrid">
+    <div class="home-grid-header">
+      <h2 class="home-grid-title">All Practices</h2>
+      <span class="home-grid-count" id="homeGridCount">24 practices</span>
+    </div>
+    <div class="home-practice-grid" id="homePracticeGrid">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO USE PAGE -->
+<div id="howToUsePage" class="page">
+  <div class="htu-body">
+    <h1 class="htu-title">How to use</h1>
+
+    <div class="accordion">
+
+      <!-- 1. What is ... -->
+      <div class="acc-item open" id="acc1">
+        <button class="acc-trigger" onclick="toggleAcc('acc1')">
+          What is Positive Sustainability Design Toolkit?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="acc-content">
+              <div class="acc-left"><div class="acc-left-img"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how002.png" alt="acc1"></div></div>
+              <div class="acc-right">
+                <p>The Positive Sustainability Design Toolkit is here to support you as you design everyday experiences that help people feel good and do good. Whether you're creating a new product, refining a service, or simply exploring opportunities for positive impact, this toolkit provides research-grounded insights that can inspire meaningful, sustainable design.</p>
+                <h4>Who can benefit</h4>
+                <div class="highlight-box">
+                  <ul>
+                    <li>Product and service designers</li>
+                    <li>UX/UI designers and researchers</li>
+                    <li>Sustainability practitioners and circular economy innovators</li>
+                    <li>Design educators and students</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Understanding Each Practice -->
+      <div class="acc-item" id="acc2">
+        <button class="acc-trigger" onclick="toggleAcc('acc2')">
+          Understanding Each Practice
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="acc-content">
+              <div class="acc-left"><div class="acc-left-img"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how003.png" alt="acc2"></div></div>
+              <div class="acc-right">
+                <p>Each of the 49 positive practices is presented in a way that supports hands-on design work.</p>
+                <h4>Inside every practice, you'll find</h4>
+                <div class="info-box"><strong>Title &amp; Data-Based Narratives</strong>Clear explanations grounded in real user stories</div>
+                <div class="info-box"><strong>Positive Emotions</strong>The primary feelings people experience through the practice</div>
+                <div class="info-box"><strong>Context Tags</strong>Related home domains including food, cleaning, clothing care, air care, and personal care</div>
+                <div class="info-box"><strong>Well-Being Tags</strong>Whether the practice supports hedonia, eudaimonia, or both</div>
+                <div class="info-box"><strong>Sustainability Tags</strong>Frugal, pro-ecological, altruistic, or equitable behaviors</div>
+                <div class="info-box"><strong>Effects</strong>Common outcomes described by users</div>
+                <div class="info-box"><strong>How Might We Try This Practice</strong>Ways to explore and experiment with the practice</div>
+                <div class="info-box"><strong>90-Second Audio Summary</strong>Quick introductions you can listen to anytime</div>
+                <p style="margin-top:16px">Think of these elements as small windows: each offers a different angle on what makes the practice feel good, work well, and naturally support sustainable behavior.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Four ways -->
+      <div class="acc-item" id="acc3">
+        <button class="acc-trigger" onclick="toggleAcc('acc3')">
+          Four ways to utilize this toolkit
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="acc-content">
+              <div class="acc-left"><div class="acc-left-img"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how004.png" alt="acc3"></div></div>
+              <div class="acc-right">
+                <p>This toolkit offers multiple pathways to discover practices that align well-being with sustainability. Whether you're beginning a new project, designing for a specific context, or working toward particular emotional or environmental goals, you can navigate the 49 practices through four complementary approaches.</p>
+
+                <h4>Exploration Mode</h4>
+                <div class="highlight-box">
+                  <p>Use the hero sentence builder to filter practices interactively. Select everyday activities, <strong style="font-weight:600;color:var(--tag-wellbeing-text)">"feel good" qualities</strong>, and <strong style="font-weight:600;color:var(--tag-sustainability-text)">"do good" behaviors</strong> to discover relevant practices.</p>
+                  <ul>
+                    <li><strong>Try this when:</strong> You're seeking general inspiration or starting a new project</li>
+                    <li><strong>Example:</strong> Filter for "cooking" + "meaningful" + "pro-ecological" to discover practices around transforming meal prep into creative rituals that minimize food waste.</li>
+                  </ul>
+                </div>
+
+                <h4>Context-Based Discovery</h4>
+                <div class="highlight-box">
+                  <p>Choose a <strong>specific home activity domain</strong> (cooking, cleaning, etc.) and explore all practices within that context.</p>
+                  <ul>
+                    <li><strong>Try this when:</strong> You're designing for a particular product category or use context</li>
+                    <li><strong>Example:</strong> Exploring all "clothing care" practices reveal patterns around mindful consumption, community sharing, and creative care routines that could inform a laundry product redesign.</li>
+                  </ul>
+                </div>
+
+                <h4>Well-Being Lens</h4>
+                <div class="highlight-box">
+                  <p>Filter by the type of well-being you want to support using <strong>enjoyable tags to explore hedonic well-being</strong>, <strong>meaningful tags for eudaimonic well-being</strong>, or both!</p>
+                  <ul>
+                    <li><strong>Try this when:</strong> You have specific emotional or psychological goals for your design</li>
+                    <li><strong>Example:</strong> Focusing on "both hedonia and eudaimonia" reveals practices that offer immediate sensory pleasure while building meaningful skills or relationships.</li>
+                  </ul>
+                </div>
+
+                <h4>Sustainability Lens</h4>
+                <div class="highlight-box">
+                  <p>Select a sustainability behavior type you want to promote (frugal, pro-ecological, altruistic, or equitable). Explore practices that naturally encourage this behavior.</p>
+                  <ul>
+                    <li><strong>Try this when:</strong> Your project has specific environmental or social impact goals</li>
+                    <li><strong>Example:</strong> Exploring "altruistic" practices might reveal opportunities for neighborhood sharing systems or community-oriented features in home products.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Working Solo or in Teams -->
+      <div class="acc-item" id="acc4">
+        <button class="acc-trigger" onclick="toggleAcc('acc4')">
+          Working Solo? or in Teams?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="acc-content">
+              <div class="acc-left"><div class="acc-left-img"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how007.png" alt="acc4"></div></div>
+              <div class="acc-right">
+                <p>You can adapt the toolkit's use to your working style and project structure. Use it independently to guide your design process from discovery through evaluation, or leverage it as a collaborative framework to align teams, engage stakeholders, and co-create with users.</p>
+
+                <h4>Individual Design Work</h4>
+                <div class="step-card"><h5>STEP 1: Discover and Empathize</h5><p>Identify which practices resonate with your target users and where gaps exist between current behaviors and desired experiences. Map key moments before, during, and after product interactions, selecting practices that match emotions and behaviors at each touchpoint.</p></div>
+                <div class="step-card"><h5>STEP 2: Find Inspiration and Ideate</h5><p>Use any navigation approach to discover 3–5 relevant practices. Brainstorm how to translate these patterns into your design context. Generate variations and combine elements from multiple practices for novel solutions.</p></div>
+                <div class="step-card"><h5>STEP 3: Prototype and Enrich</h5><p>Design interventions that facilitate specific practices, testing whether they trigger intended emotions and behaviors. Revisit existing designs through the lens of positive practices, layering in savoring techniques or sustainability behaviors you hadn't considered.</p></div>
+                <div class="step-card"><h5>STEP 4: Evaluate</h5><p>Assess concepts against dual-impact criteria. Measure both emotional resonance and sustainability outcomes.</p></div>
+
+                <h4>Collaborative Sessions</h4>
+                <div class="step-card"><h5>STEP 1: Discover and Co-create</h5><p>Explore practices with users, clients, or domain experts as conversation starters. Understand which practices resonate and identify gaps between current and desired experiences.</p></div>
+                <div class="step-card"><h5>STEP 2: Ideate Together</h5><p>In small groups, select 2–5 practices and brainstorm integration possibilities. Consider the main product context, and positive emotions, well-being, or sustainability domains aimed to be achieved.</p></div>
+                <div class="step-card"><h5>STEP 3: Prototype and Test</h5><p>Sketch and prototype design interventions that facilitate specific practices, based on the design toolkit. Collaboratively test whether they trigger the intended emotions and behaviors.</p></div>
+                <div class="step-card"><h5>STEP 4: Evaluate collectively</h5><p>Assess and iterate concept developments through the dual-impact lens. Assess feasibility and desirability together, measuring both emotional resonance and sustainability outcomes. Refine based on collective insight.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Maximize -->
+      <div class="acc-item" id="acc5">
+        <button class="acc-trigger" onclick="toggleAcc('acc5')">
+          Maximize your design potential
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="acc-content">
+              <div class="acc-left"><div class="acc-left-img"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how006.png" alt="acc5"></div></div>
+              <div class="acc-right">
+                <p>These practices offer starting points, not prescriptions. To create truly impactful designs, adapt patterns to your specific context, validate them with your users, and explicitly connect the emotional and sustainability dimensions. The following considerations will help you translate research insights into design solutions that resonate with your audience and amplify dual impact.</p>
+
+                <h4>Adapt to Your Context</h4>
+                <div class="highlight-box">
+                  <p><strong>All the practices are home contextual patterns and inspirations. Translate them creatively to fit your product/service types.</strong></p>
+                  <p style="margin-top:8px">You may think about these questions for your design:</p>
+                  <ul>
+                    <li>How can I apply this practice pattern to fit my specific product context and user needs?</li>
+                    <li>How do the physical materials, positive emotions, and sustainable behavioral elements of this practice work together in my design?</li>
+                  </ul>
+                </div>
+
+                <h4>Test with Your Users</h4>
+                <div class="highlight-box">
+                  <p><strong>These practices emerged from research with young adults (18–25) in the United States using home appliances. Validate how patterns manifest for your specific users across different ages, cultures, and product categories.</strong></p>
+                  <p style="margin-top:8px">These questions may strengthen understanding of users:</p>
+                  <ul>
+                    <li>How can I translate this practice pattern to fit my target users' age, cultural background, and living situations?</li>
+                    <li>How can I validate these patterns with my specific audience?</li>
+                  </ul>
+                </div>
+
+                <h4>Connect the Dots</h4>
+                <div class="highlight-box">
+                  <p><strong>Connect emotional benefits explicitly to sustainability outcomes rather than treating them separately. Help people see the dual benefit. Design cues, feedback, or celebrations that highlight these experiences.</strong></p>
+                  <p style="margin-top:8px">These questions may help your design development:</p>
+                  <ul>
+                    <li>Does my design clearly link the positive feelings users experience with the sustainable behaviors they're performing?</li>
+                    <li>How might my design make this positive practice more noticeable and accessible in users' homes?</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end accordion -->
+  </div><!-- end htu-body -->
+
+  <!-- Share section footer -->
+  <div class="share-section">
+    <div class="share-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how001.png" alt="how to use" style="width:100%;max-width:200px;border-radius:12px"></div>
+    <div class="share-text">
+      <h3>Share your journey!</h3>
+      <p>Your experiences, questions, and insights help this toolkit evolve. Whether you've discovered surprising applications, encountered interesting challenges, or simply want to share your story.</p>
+      <p>Contact us <a href="/cdn-cgi/l/email-protection#eba88499858e8787c5a6afbfa7ab8c868a8287c5888486">Cornell.MDTL[at]gmail.com</a> to share feedback, ask questions, or contribute new perspectives that can enrich future iterations.</p>
+    </div>
+  </div>
+</div>
+
+<!-- EXPLORE ALL PAGE -->
+
+<div id="explorePage" class="page">
+  <!-- Compact sticky header with same tagline -->
+  <div class="explore-header">
+    <div class="explore-tagline">
+      <button class="search-trigger-btn" onclick="runExploreFilter()" title="Search practices">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      How can we design
+      <div class="dd-wrap" id="ddWrapEveryday2">
+        <span class="dropdown-tag pink" id="ddBtnEveryday2" onclick="toggleDropdown2('everyday')">
+          <span id="ddLabelEveryday2">positive everyday</span>
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+        <div class="dd-panel pink-panel" id="ddPanelEveryday2">
+          <button class="dd-main-opt pink-opt" onclick="selectOption2('everyday','positive everyday')">positive everyday</button>
+          <div class="dd-divider"></div>
+          <button class="dd-sub-opt" onclick="selectOption2('everyday','positive cooking')">positive cooking</button>
+          <button class="dd-sub-opt" onclick="selectOption2('everyday','positive cleaning')">positive cleaning</button>
+          <button class="dd-sub-opt" onclick="selectOption2('everyday','positive clothing care')">positive clothing care</button>
+          <button class="dd-sub-opt" onclick="selectOption2('everyday','positive personal care')">positive personal care</button>
+          <button class="dd-sub-opt" onclick="selectOption2('everyday','positive indoor air care')">positive indoor air care</button>
+        </div>
+      </div>
+      experiences that are
+      <div class="dd-wrap" id="ddWrapAct2">
+        <span class="dropdown-tag green" id="ddBtnAct2" onclick="toggleDropdown2('act')">
+          <span id="ddLabelAct2">responsible</span>
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+        <div class="dd-panel green-panel" id="ddPanelAct2">
+          <button class="dd-main-opt green-opt" onclick="selectOption2('act','responsible')">responsible</button>
+          <div class="dd-divider"></div>
+          <button class="dd-sub-opt" onclick="selectOption2('act','frugal')">frugal</button>
+          <button class="dd-sub-opt" onclick="selectOption2('act','pro-ecological')">pro-ecological</button>
+          <button class="dd-sub-opt" onclick="selectOption2('act','altruistic')">altruistic</button>
+          <button class="dd-sub-opt" onclick="selectOption2('act','equitable')">equitable</button>
+        </div>
+      </div>
+      ?
+    </div>
+  </div>
+
+  <div class="explore-grid-wrap">
+    <div class="explore-count" id="exploreCount">Showing all 24 practices</div>
+    <div class="explore-grid" id="exploreGrid"></div>
+  </div>
+</div>
+
+
+<!-- ABOUT PAGE -->
+<div id="aboutPage" class="page">
+
+  <div class="about-body">
+    <h1 class="about-title">About</h1>
+
+    <!-- Hero intro -->
+    <div class="about-intro">
+      <div class="about-intro-text">
+        <h2>Positive Sustainability Design Toolkit:</h2>
+        <h3>Discover practices that feel good and do good</h3>
+        <p>The Positive Sustainability Design Toolkit is an open-access online resource created to help you design everyday experiences that uplift people's well-being while supporting sustainable behaviors. We call these positive practices, which are interaction patterns with everyday technologies that help people feel good and act in ways that do good.</p>
+        <p>Through in-depth research with young adults (18–25 years old) across the United States, we identified 20 distinct positive practices observed in how people engage with home appliances. These practices appear across five everyday contexts of food, cleaning, clothing care, air care, and personal care, and show how simple routines can support both personal fulfillment and responsible living.</p>
+      </div>
+      <div class="about-intro-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_about/about001.png" alt="about intro" style="width:100%;border-radius:16px"></div>
+    </div>
+
+    <!-- Accordion -->
+    <div class="accordion">
+
+      <!-- 1. Why -->
+      <div class="acc-item" id="abt1">
+        <button class="acc-trigger" onclick="toggleAbout('abt1')">
+          Why Positive Sustainability Design Toolkit?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-acc-grid">
+                <div>
+                  <div class="about-content-box">
+                    <p><strong>Think of your daily routine. What moments bring you joy?</strong></p>
+                    <p>Perhaps experimenting with a new recipe, the satisfaction of a clean space, or the pride in caring for a cherished item. These aren't just mundane tasks. These everyday interactions are rich with potential for both personal fulfillment and environmental responsibility. Everything you create shapes how people feel and act in their daily lives.</p>
+                    <p>The toolkit aims to inspire you with rich information on the convergence of well-being and sustainability, and to encourage you to explore these synergies in your own design work. It can be used by anyone interested in creating positive everyday experiences: a product designer, a UX researcher, a sustainability practitioner, or anyone else working to shape how people live at home.</p>
+                  </div>
+                </div>
+                <div class="about-acc-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_about/about003.png" alt="well-being" style="width:100%;border-radius:12px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Research Foundation -->
+      <div class="acc-item" id="abt2">
+        <button class="acc-trigger" onclick="toggleAbout('abt2')">
+          The Research Foundation
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-acc-grid" style="grid-template-columns: 1fr 260px; align-items: start;">
+                <div class="about-content-box" style="margin-bottom:0">
+                    <h4 style="margin-top:0">Understanding Well-being</h4>
+                    <p>In this toolkit, "feel good" represents well-being. We distinguish between two types of well-being experiences:</p>
+                    <ul>
+                      <li><strong>Hedonic well-being</strong> focuses on pleasure, enjoyment, and positive sensory experiences. Practices labeled as "enjoyable" support this dimension.</li>
+                      <li><strong>Eudaimonic well-being</strong> focuses on meaning, purpose, and personal growth. Practices labeled as "meaningful" support this dimension.</li>
+                      <li>Practices marked as both "enjoyable and meaningful" support both types of well-being simultaneously.</li>
+                    </ul>
+                    <p style="margin-top:12px">Our research draws on 10 savoring strategies (Bryant &amp; Veroff, 2017), which are psychological techniques that help people consciously attend to and prolong positive experiences. Savoring has been demonstrated to enhance happiness, resilience, and adaptive coping in psychology research, yet its application in sustainable technology design remains underexplored.</p>
+                </div>
+                <div class="about-acc-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_about/about004.png" alt="research" style="width:100%;border-radius:12px"></div>
+                <div class="about-content-box" style="margin-bottom:0">
+                    <h4 style="margin-top:0">Understanding Sustainability</h4>
+                    <p>In this toolkit, "do good" represents sustainability. We distinguish between four types of sustainable behaviors:</p>
+                    <ul>
+                      <li><strong>Frugal behaviors</strong> focus on mindful resource use and waste reduction.</li>
+                      <li><strong>Pro-ecological behaviors</strong> focus on protecting natural environments.</li>
+                      <li><strong>Altruistic behaviors</strong> focus on benefiting others and your community.</li>
+                      <li><strong>Equitable behaviors</strong> focus on fair distribution of resources and opportunities.</li>
+                    </ul>
+                    <p style="margin-top:12px">These four behavior domains (Corral-Verdugo et al., 2011; 2012) are interconnected. A single practice may also support multiple types of sustainable behavior.</p>
+                </div>
+                <div class="about-acc-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_about/about005.png" alt="research" style="width:100%;border-radius:12px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Created by -->
+      <div class="acc-item" id="abt3">
+        <button class="acc-trigger" onclick="toggleAbout('abt3')">
+          The Positive Sustainability Design Toolkit was created by
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <p>This toolkit is an initiative of Meta Design Technology Lab at Cornell University. The research investigates how everyday technologies can be systematically designed to foster sustainability and well-being simultaneously through theories of savoring and sustainable behaviors. We believe that designing for dual impact in well-being and sustainability is not just possible but essential. Thank you for being part of this journey toward more positive, sustainable futures.</p>
+              <div class="credit-grid">
+                <div class="credit-card">
+                  <strong>Concept &amp; Production</strong>
+                  <ul>
+                    <li>Jay (Jungkyoon) Yoon</li>
+                    <li>Gaeul Han</li>
+                  </ul>
+                </div>
+                <div class="credit-card">
+                  <strong>Funding &amp; Support</strong>
+                  <p>This research was made possible through NSF and NRF Korea.</p>
+                </div>
+                <div class="credit-card">
+                  <strong>Data Collection &amp; Analysis</strong>
+                  <ul>
+                    <li>Jay (Jungkyoon) Yoon</li>
+                    <li>Gaeul Han</li>
+                    <li>Samika Agarwal</li>
+                  </ul>
+                </div>
+                <div class="credit-card">
+                  <strong>Web design</strong>
+                  <ul>
+                    <li>Jay (Jungkyoon) Yoon</li>
+                    <li>Gaeul Han</li>
+                    <li>Katherine Huang</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="credit-card" style="margin-top:0">
+                <strong>Citation</strong>
+                <p>Author names. (2025). Positive Sustainability Toolkit. [Institution]. [URL]</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end accordion -->
+  </div><!-- end about-body -->
+
+  <!-- Share Your Insights -->
+  <div class="about-share">
+    <div class="about-share-text">
+      <h3>Share Your Insights</h3>
+      <p>We would love to hear from you and learn from your experiences. Your questions and feedback will help us improve future versions of the toolkit.</p>
+      <p>Contact us <a href="/cdn-cgi/l/email-protection#6724081509020b0b492a23332b27000a060e0b4904080a">Cornell.MDTL[at]gmail.com</a> to share feedback, ask questions, or contribute new perspectives that can enrich future iterations.</p>
+    </div>
+    <div class="about-share-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_about/about002.png" alt="share" style="width:100%;max-width:220px;border-radius:12px"></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <h2 class="faq-title">FAQ</h2>
+    <div class="accordion">
+
+      <div class="acc-item" id="faq1">
+        <button class="acc-trigger" onclick="toggleAbout('faq1')">
+          Q. Why Positive Sustainability Design Toolkit?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-acc-grid">
+                <div>
+                  <div class="about-content-box">
+                    <p>This toolkit reflects <strong>patterns observed among young adults (18–25 years old) in the United States</strong>, focusing on interactions with <strong>home appliances.</strong> We chose this demographic as our starting point to deeply understand how emerging adults, who are forming lifelong habits, engage with everyday technologies in ways that support both well-being and sustainability.</p>
+                    <p>However, we recognize that practice preferences and engagement patterns evolve throughout life, and that cultural contexts significantly shape how practices are experienced and valued.</p>
+                    <p>We encourage <strong>designers to use these practices as inspiration and starting points</strong>, validating and adapting them for their specific users and contexts. Your insights from different age groups, cultural backgrounds, or living situations can help future iterations better serve the design community.</p>
+                  </div>
+                </div>
+                <div class="about-acc-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how009.png" alt="faq" style="width:100%;border-radius:12px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" id="faq2">
+        <button class="acc-trigger" onclick="toggleAbout('faq2')">
+          Q. Can I apply these practices to products beyond home appliances?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-acc-grid">
+                <div>
+                  <div class="about-content-box">
+                    <p><strong>Absolutely!</strong></p>
+                    <p>While our research focused on home appliances across five contexts of food, cleaning, clothing care, air care, and personal care, the underlying patterns of positive practices can inspire innovations across <strong>diverse everyday services and products.</strong></p>
+                    <p>The principles of how people savor experiences while engaging in sustainable behaviors are applicable to many design challenges. We encourage you to explore how these patterns might translate to your specific domain.</p>
+                  </div>
+                </div>
+                <div class="about-acc-illus"><img src="https://gaeulhan457.github.io/toolkit-images/illust_how/how010.png" alt="faq" style="width:100%;border-radius:12px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" id="faq3">
+        <button class="acc-trigger" onclick="toggleAbout('faq3')">
+          Q. How should I cite this toolkit? (If we have a publication)
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-content-box">
+                <p>When referencing this work in academic or professional contexts, please use:</p>
+                <p style="margin-top:10px;font-style:italic">Author names. (2025). Positive Sustainability Toolkit. [Institution]. [URL]</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" id="faq4">
+        <button class="acc-trigger" onclick="toggleAbout('faq4')">
+          Q. What license governs this toolkit?
+          <span class="acc-icon"></span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-inner">
+            <div class="about-acc-body">
+              <div class="about-content-box">
+                <p>This toolkit is published under [Creative Commons license type], allowing you to share and use it for non-commercial purposes with appropriate attribution.</p>
+                <p style="margin-top:10px">Thank you for asking these questions!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end faq accordion -->
+  </div><!-- end faq-section -->
+
+</div><!-- end aboutPage -->
+
+<div id="detailPage" class="page">
+  <div class="detail-page fade-in" id="detailContent"></div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── DATA ──────────────────────────────────────────────────────────────
+const practices = {
+  P001: {
+    id: "P001",
+    title: `Diving into a sense of immersion with ingredients`,
+    description: `This practice captures the immersive, sensory-rich experience of ingredient preparation, where individuals naturally become absorbed in the process. Through touch, sound, and aroma, these moments foster a meditative flow, bringing calmness, focus, and a deep connection to the ingredients. Beyond its psychological rewards, this act of intentional preparation often includes choosing fresh produce, minimizing waste through pre-planned usage, and sharing nourishing outcomes with others. These patterns, while rooted in personal well-being, extend to responsible and caring use of natural resources.`,
+    story: `You open the refrigerator and pause, cool air brushing your face. Inside, everything is just where you left it. You can find bundles of herbs wrapped in paper towels, yesterday’s lemon half, crisp vegetables lined up like quiet reminders. You reach for what you need, already imagining the steps ahead.  
+Back at the counter, your hands move on instinct to prepare a meal for your partner and yourself. The knife moves in steady strokes with the sounds of tapping the board. The crisp snap of celery, the spicy scent of peeled onion, the weight of a potato in your hand. 
+The sound and motion repeat like a beat of music. Each slice pares down the noise in your head, leaving only the texture, color, and scent of what’s right in front of you. Lastly, you carefully wrap the leftover fresh ingredients and place them back into the fridge. `,
+    effects: `What started as simple daily tasks such as cooking, making coffee, and juicing, became meaningful rituals that brought creativity, mindfulness, and balance to my life, turning routine moments into sources of joy, fulfillment, and well-being.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Respect", "Energetic", "Confidence"],
+    when_to_try: ["Designing for sensory cooking immersion.", "Enhancing tactile ingredient engagement.", "Creating flow in food preparation"],
+    related: ["P002", "P005", "P024"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P001/P001_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P001/P001_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P001/P001_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P001/P001_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P001_audio.mp3",
+    emoji: "🥗",
+    cardColor: "#fffbe6"
+  },
+  P002: {
+    id: "P002",
+    title: `Making a nourishing gift for myself`,
+    description: `This practice is the personal ritual of preparing food and drinks as an act of self-care and fulfillment. Whether making a smoothie, cooking a meal, or brewing coffee, these moments allow individuals to savor their capabilities, nurture their well-being, and experience joy in creating something meaningful for themselves. Often intertwined with post-workout rituals or morning resets, this practice supports emotional balance, physical vitality, and mental clarity. In some instances, it extends into the shared realm, where the prepared item becomes a quiet offering to others, symbolizing care, kindness, and connection. In its thoughtful simplicity, it promotes resource-conscious habits and a sense of gratitude toward what is available and nourishing.`,
+    story: `The workout wasn’t easy today. Still, you pushed through, and now it’s time to thank yourself.
+You head to the kitchen quietly. Half a banana, a scoop of protein powder, and a generous spoonful of cocoa. Some milk and a few ice cubes go into the blender. This is your favorite recipe for your health as well as flavor.
+As the blender hums to life, the rich scent of chocolate fills the air. You pour it slowly, take the first sip. It’s cold, a little sweet, and exactly what you needed. One sip at a time, it’s like a gift you give yourself after a heavy workout. `,
+    effects: `What began as simple daily tasks like blending smoothies, brewing coffee, and cooking, evolved into meaningful rituals that nourish my body, enhance my well-being, and provide a sense of accomplishment, balance, and self-care.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Confidence", "Pride"],
+    when_to_try: ["Designing personalized self-care treats.", "Celebrating post-workout nutrition rituals.", "Encouraging mindful solitary brewing."],
+    related: ["P001", "P010", "P024"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P002/P002_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P002/P002_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P002/P002_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P002/P002_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P002_audio.mp3",
+    emoji: "🥤",
+    cardColor: "#fff3e0"
+  },
+  P003: {
+    id: "P003",
+    title: `Enjoying super convenient cooking`,
+    description: `Whether reheating leftovers or finding quick meals through digital tools, this practice highlights the joy of effortless and convenient food preparation, where efficiency and ease bring comfort. This helps save time on meal preparation and cleanup, allowing individuals to focus on personal care, stress relief, or other meaningful activities while still enjoying a satisfying and familiar food experience. Though these methods may not
+
+always prioritize health or environmental ideals, they somehow reflect self-kindness, mental efficiency, and thoughtful resource use. Especially when they reduce food leftovers, support home-cooked alternatives, or create shared moments of connection with family.`,
+    story: `It’s already past 7 p.m. when you finally kick off your shoes and set your bag down. You’re too tired to think, much less cook. But thankfully, the microwave stands ready like always.
+You open the fridge and pull out the leftover Pad Thai from last night. You open the microwave door and slide it in, then tap the 30-second button twice. The hum begins. Then you lean against the sofa while the scent of sauce slowly fills the air.
+Ding! You take the container out and feel the warmth on your fingertips. Sitting at the kitchen table, you twirl the noodles and take a bite. It’s not fancy, and maybe not perfect, but it's warm and easy. `,
+    effects: `Using the slow cooker, blender, and microwave not only provided convenience but transformed food preparation into a mindful, calming ritual that nourished both my body and spirit, making it a meaningful part of my daily routine.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Gratitude", "Pleasant surprise"],
+    when_to_try: ["Designing for guilt-free convenience.", "Simplifying tired evening meal routines.", "Supporting effortless comfort food experiences."],
+    related: ["P011", "P009", "P014"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P003/P003_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P003/P003_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P003/P003_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P003/P003_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P003_audio.mp3",
+    emoji: "🍜",
+    cardColor: "#fdecea"
+  },
+  P004: {
+    id: "P004",
+    title: `Exploring new flavors & having my own special recipe`,
+    description: `Whether trying new ingredients, perfecting a signature dish, or drawing inspiration from online sources, these experiences foster a sense of pride, accomplishment, and a deeper connection to food. This practice highlights the joy of experimenting with flavors and crafting personal recipes, turning cooking into a creative and fulfilling ritual. This often includes the use of home-prepared ingredients, mindful consumption habits, and occasional sharing of the outcomes with others. By doing so, individuals can also promote practical sustainable routines such as reducing reliance on processed foods, reusing ingredients across meals, and nurturing social bonds through food. `,
+    story: `It’s Saturday afternoon, the day before your usual grocery run. You open the fridge and scan the shelves: half a red onion, a few soft zucchinis, a small container of yogurt tucked in the back. These aren’t just leftovers, they spark new inspiration. You pull them out, already imagining what they could become.
+You choose a recipe video based on what you have. As you follow along, your hands move smoothly. Chopping zucchini and onion, stirring them into the pan as a soft sizzle fills the warm air. You tweak the recipe to your taste, swapping in your favorite herbs or adjusting the sauce. 
+Your roommate passes by, catches the scent, and grins. You smile back, holding a dish made from scraps and quiet creativity.`,
+    effects: `After consistently using my home appliances, You can find that cooking became more than just a task. It turned into a creative and grounding ritual that brought me satisfaction, calm, and a sense of accomplishment, making it an essential part of my daily routine.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Desire", "Love", "Anticipation"],
+    when_to_try: ["Encouraging culinary experimentation and creativity.", "Celebrating personal recipe discoveries.", "Designing for confident flavor exploration."],
+    related: ["P005", "P012", "P001"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P004/P004_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P004/P004_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P004/P004_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P004/P004_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P004_audio.mp3",
+    emoji: "🍳",
+    cardColor: "#e8f5e9"
+  },
+  P005: {
+    id: "P005",
+    title: `Sharing good tasty or scent moments with others`,
+    description: `This practice captures the joy of sharing food, aromas, and cooking experiences with others, where simple acts like brewing coffee, baking, or grilling spark moments of connection. Whether through conversations, laughter, or the shared anticipation of a meal, these experiences strengthen bonds and create warm, sensory-filled memories. These moments often promote homemade meal preparation over commercial alternatives, reduce waste through shared consumption, and strengthen relationships and community ties through food-centered rituals. `,
+    story: `It’s Saturday evening, and your kitchen is already warm from the electric stovetop. Behind you, the living room hums with voices and soft laughter. Your friends have started arriving one by one, settling into the couch.
+You stir the soup before turning to check on the roasting vegetables. Your soup simmers gently, releasing a scent that winds through the apartment with savory and just slightly sweet. Friends start drifting in too, drawn by the smell in the air.
+Everyone breathes deeper, noses lifting toward the scent. The delicious aroma of the soup became the spark for an interesting story. You smile and keep chopping and stirring. It feels like the evening has already begun, even before your cooking is done. `,
+    effects: `What started as simple daily tasks, such as brewing coffee, cooking, or baking, has evolved into meaningful rituals that bring me joy, mindfulness, and a sense of accomplishment, improving my well-being and strengthening my connections with others.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Desire", "Gratitude", "Anticipation"],
+    when_to_try: ["Designing for shared aromatic anticipation.", "Enhancing social connection through scent.", "Creating inviting kitchen atmospheres."],
+    related: ["P006", "P012", "P021"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P005/P005_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P005/P005_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P005/P005_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P005/P005_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P005_audio.mp3",
+    emoji: "☕",
+    cardColor: "#fdf8e1"
+  },
+  P006: {
+    id: "P006",
+    title: `Kitchen teamwork - we are a team!`,
+    description: `This practice captures the joy of cooking as a shared experience, where preparing meals becomes a collaborative act that strengthens bonds. Whether selecting ingredients together, taking on different roles in the kitchen, or simply sharing ideas and flavors, these moments foster teamwork, connection, and a shared sense of accomplishment in creating something delicious. Doing so, the practice brings mindful choices in using what's available at home, cooking instead of eating out, or planning ahead together, leading to habits that naturally reduce excess consumption and promote efficient use of food and tools. `,
+    story: `Today's dinner is curry. The kitchen hums with the soft chop of your knife and the low sizzle from the induction cooktop.
+You’re the prep master today, peeling carrots, dicing onions, and arranging them in small glass bowls on the counter. Your partner is the main chef today, tasting and adjusting spices. While your partner stirs the curry, you warm up the leftover chicken from yesterday in the air fryer.
+No grand gestures, but just the ease of moving together. The scent of curry is blooming in the room. Finally, as the sauce thickens and the timer ticks down, you both look at the simmering pot and nod. `,
+    effects: `What started as a simple task became a meaningful ritual, bringing joy, relaxation, and a sense of accomplishment while also fostering connection, creativity, and emotional well-being.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Confidence", "Satisfaction", "Relaxation", "Energetic"],
+    when_to_try: ["Facilitating collaborative kitchen workflows.", "Designing for couple's cooking synchrony.", "Supporting shared culinary roles."],
+    related: ["P005", "P007", "P016"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P006/P006_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P006/P006_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P006/P006_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P006/P006_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P006_audio.mp3",
+    emoji: "👩‍🍳",
+    cardColor: "#e3f2fd"
+  },
+  P007: {
+    id: "P007",
+    title: `Feeling connected by cooking for others`,
+    description: `This practice highlights the deep sense of connection and fulfilment that comes from preparing food for loved ones. Whether making a meal for family, a partner, or a guest, the act of cooking becomes a meaningful way to express care, strengthen bonds, and create shared moments of warmth and appreciation. At the same time, these practices often reflect thoughtful personal choices such as making healthy meals at home, avoiding processed or packaged food, or managing ingredients for safety and nutrition. `,
+    story: `The morning light outside is still soft. You’re in the kitchen and putting your favorite sliced bread into a toaster. You press the toaster lever down and step to the stove, where the bacon and scrambled eggs cook slowly in a pan.
+At some point in making this healthy breakfast for yourself, preparing one more for your partner alongside yours became such a natural addition. The scent of warm bread begins to fill the air. As the crisp slices pop up, you lay them on plates and layer sliced avocado in even rows.
+Imagining partner’s smile when they see this spread, you sprinkle on a dash of seasoning and add a wedge of fruit on the side. You also smile already. `,
+    effects: `This practice not only improved my well-being by creating a sense of routine and relaxation but also strengthened my connections, increased my awareness of food, and brought fulfillment through simple, meaningful moments.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Love", "Pride"],
+    when_to_try: ["Expressing love through breakfast rituals.", "Designing for thoughtful meal gifting.", "Enhancing the joy of serving."],
+    related: ["P006", "P012", "P018"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P007/P007_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P007/P007_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P007/P007_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P007/P007_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P007_audio.mp3",
+    emoji: "💛",
+    cardColor: "#fffde7"
+  },
+  P008: {
+    id: "P008",
+    title: `Cooking with other's know-how and memory`,
+    description: `This practice highlights the warmth of cooking traditions passed down from loved ones, where personal routines are enriched by family knowledge and memories. Whether following a parent’s advice, using a grandparent’s technique, or recalling shared moments through food, these experiences create a comforting sense of connection and nostalgia. In some cases, the traditional know-how includes sustainable resourcefulness, such as reusing ingredients or using healthy and natural ingredients.`,
+    story: `You stand by the stove, the pan still warm from this morning’s bacon. There’s just enough golden grease left to coat the bottom just like your grandmother always did.
+She believed no flavor should be wasted and taught you her secret for the best toast. It's sautéing vegetables and eggs in that same pan, and brushing a little grease on the crispy toast. You drop two slices into the toaster and set the dial to the perfect time, as she said.
+When the bread pops up, you press it into the warm plate and add everything on top. The scent is smoky and sweet. Your roommate takes a bite and pauses, eyes crinkling with surprise. `,
+    effects: `This practice gives me a sense of fulfillment, accomplishment, and joy, while also ensuring I enjoy a nourishing and satisfying experience.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Respect", "Desire"],
+    when_to_try: ["Preserving family culinary traditions.", "Integrating nostalgic cooking techniques.", "Designing for intergenerational recipe sharing."],
+    related: ["P006", "P009", "P007"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P008/P008_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P008/P008_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P008/P008_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P008/P008_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P008_audio.mp3",
+    emoji: "📖",
+    cardColor: "#f3e5f5"
+  },
+  P009: {
+    id: "P009",
+    title: `Feeling love through other's cooking/repairing machines`,
+    description: `This practice reflects the emotional warmth and sense of being cared for that arises when loved ones use household appliances, such as toasters, mixers, or coffee makers, to prepare food or support daily routines. Whether it’s a partner fixing a kitchen appliance or cooking a meal, these small acts of service create powerful feelings of connection, gratitude, and psychological comfort. In some cases, such behavior reflects indirect support for sustainable lifestyles, such as home-prepared meals replacing commercial alternatives or reducing the strain of manual labor through shared responsibility. `,
+    story: `You and your partner begin every morning with the quiet hum of the coffee maker, the gentle clinking of mugs. But today, the coffee machine acts up, like letting out too much water or dripping where it shouldn’t. You’ve noticed the coffee tastes weaker, not quite the rich flavor you prefer.
+Later, you discover that your partner quietly fixes the coffee machine by checking the water container, clearing nozzle clogs, and reassembling it with care.
+The partner doesn’t need to tell you. Whenever you take a slow sip, you can notice the difference. The coffee feels warmer and more aromatic. `,
+    effects: `Using the toaster consistently brings me more joy in the morning, as the tastier food leads to a better start to the day, and it has become a lovely routine for my family to enjoy their coffee before leaving the house.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Energetic", "Satisfaction", "Love", "Admiration"],
+    when_to_try: ["Designing for appliance maintenance support.", "Expressing care through machine repair.", "Noticing love in prepared beverages"],
+    related: ["P008", "P012", "P013"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P009/P009_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P009/P009_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P009/P009_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P009/P009_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P009_audio.mp3",
+    emoji: "🌿",
+    cardColor: "#e8f5e9"
+  },
+  P010: {
+    id: "P010",
+    title: `A warm and aromatic pause before beginning of new day`,
+    description: `This practice highlights the comforting ritual of preparing coffee, tea, or breakfast as a mindful pause before the day begins. Whether savoring the aroma, listening to the brewing sounds, or sharing the moment with a loved one, these small yet meaningful routines create a sense of warmth, calm, and readiness for the day ahead. Some of these behaviors align with resource-conscious living by encouraging home preparation of food and beverages over commercial consumption. `,
+    story: `The kitchen is still dim with morning light, the rest of the world not quite awake yet. You move quietly, guided more by habit than thought. 
+You open the cabinet, pick today's coffee blends, and start the coffee maker. There’s something meditative about these early minutes. The steady rhythm of your coffee maker, a soft hum begins to fill the room, and the warm aroma rises. 
+Just after that first sip, you can feel the day has begun. With this small coffee, you can enjoy the calm yet vibrant moment of today. `,
+    effects: `The practice of making coffee or preparing food has evolved from a simple task into a grounding ritual, providing a sense of calm, mindfulness, and reflection, which significantly contributes to my emotional balance and overall well-being.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Gratitude", "Desire"],
+    when_to_try: ["Designing the morning coffee ritual.", "Creating a mindful day-start pause.", "Enhancing the sensory brewing process."],
+    related: ["P011", "P002", "P022"],
+    illustration_main_url: "https://gaeulhan457.github.io/toolkit-images/illust_main/P010/P010_1.png",
+    illustration_sub1_url: "https://gaeulhan457.github.io/toolkit-images/illust_main/P010/P010_2.png",
+    illustration_sub2_url: "https://gaeulhan457.github.io/toolkit-images/illust_main/P010/P010_3.png",
+    illustration_sub3_url: "https://gaeulhan457.github.io/toolkit-images/illust_main/P010/P010_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P010_audio.mp3",
+    emoji: "☕",
+    cardColor: "#fff3e0"
+  },
+  P011: {
+    id: "P011",
+    title: `Don't miss the sensational first sip/bite!`,
+    description: `This practice embraces the rich sensory pleasure and personal fulfillment found in the very first sip or bite of a thoughtfully prepared or eagerly anticipated meal or drink. Whether savoring a well-cooked meal, enjoying a drink, or pairing food with a favorite activity, these experiences create a personal moment of indulgence and self-appreciation. Some cases reflect resourceful habits or mindful consumption choices that contribute to a lighter and more intentional lifestyle. `,
+    story: `You’ve been camped out in front of the oven with knees tucked to your chest. Since your family has been craving the cinnamon rolls you make best, you’re baking a fresh batch for them. 
+You're half-watching the way the dough rose and browned behind the glass. The warm and caramelized air rushes out of the oven, making you crave the cinnamon rolls even more. But you stay calm and wait, because you’ve learned the perfect timing through all the years of working in harmony with your oven. 
+When the timer finally chimes, you quickly pick one to cool. Now, you take that very first bite and smile at its soft, pillowy inside and perfectly crisp edges. The first bite of your rolls, still warm from the oven, is always the best. `,
+    effects: `After consistently making juice, it became more than just a way to consume fruits and vegetables, using my oven regularly brought comfort and satisfaction, while cooking for myself improved my health, snd it provided an affordable way to enjoy food.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction"],
+    when_to_try: ["Maximizing the first-bite satisfaction.", "Designing for perfect temperature timing.", "Celebrating the reward of baking."],
+    related: ["P003", "P010", "P001"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P011/P011_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P011/P011_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P011/P011_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P011/P011_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P011_audio.mp3",
+    emoji: "🍞",
+    cardColor: "#fdecea"
+  },
+  P012: {
+    id: "P012",
+    title: `Enjoying other's expressions to my shared cooking`,
+    description: `This practice centers on the emotional fulfillment that arises from sharing food or nourishment and witnessing others' appreciative reactions, be it from family, significant others, guests, pets, or even wildlife. The act of cooking or feeding becomes more meaningful when met with appreciation, smiles, or moments of connection, reinforcing a sense of contribution, care, and shared happiness. These expressions reveal a deeper sense of social or ecological consciousness, where sharing food with others or nature fosters kindness, strengthens bonds, and contributes to personal purpose and joy. `,
+    story: `You haven’t seen your friends in months, so you want to make something special for them. In the kitchen, garlic, bok choy, and noodles sizzle as you stir, letting the savory aroma fill the space. 
+At last, you press the electric kettle switch down to brew jasmine tea to pair. The room, once filled with laughter, quiets for a moment with the fragrance and boiling sound. As you serve the bowls and pour the tea, your friends lean in, noses lifting slightly at the scent.
+One takes a bite, then eyes widen just a bit with a soft exhale. Another sips the tea and lets out a contented hum. A smile shared across the table. As you watch them eat and see their appreciative reactions, you also smile. `,
+    effects: `The experiences with dog, cooking, baking, hosting, and connecting with nature have all provided you with a sense of fulfillment, relaxation, and joy, by improving your dog's well-being, creating meals, saving money, or fostering harmony with nature and wildlife.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Love", "Pride", "Kindness"],
+    when_to_try: ["Capturing reactions to shared meals.", "Enhancing the joy of hosting.", "Designing for appreciative dining moments."],
+    related: ["P005", "P009", "P006"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P012/P012_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P012/P012_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P012/P012_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P012/P012_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P012_audio.mp3",
+    emoji: "🫕",
+    cardColor: "#e8f5e9"
+  },
+  P013: {
+    id: "P013",
+    title: `No matter the distance, sharing tasty moments by online dining`,
+    description: `Whether sharing a meal over a call or enjoying food alongside virtual companionship, this practice highlights the joy of staying connected through food, even when physically apart. Through phone or video calls, food discussions, or synchronized dining, individuals turn solitary moments into social ones, building a sense of connection, emotional support, and continuity in relationships. These experiences are not just about food but about cultivating togetherness, attentiveness, and resilience in maintaining bonds regardless of location. `,
+    story: `You and your partner live apart, but often cook together over a video call. Tonight, you’ve decided to make curry topped with roasted vegetables.
+When the partner says to chop the red onion and carrots, you follow the lead, syncing your rhythm to the soft crunch of partner’s cutting. When the partner heads to the microwave to warm the rice, you do the same. While you stir the sauce, you talk about your days, meetings, and what the weather is like today.
+By the time the food is ready, you each sit down with your plates and stay on the call. You and your partner take a bite together. Even from hundreds of miles away, dinner still feels like something you’re sharing. `,
+    effects: `Spending time with partner, friend, or others can make you feel more confident and true to yourself, while using the apps gives you a cheap and easy way to treat yourself to good food without overspending.`,
+    context: "Cooking",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Pleasant surprise", "Satisfaction", "Relaxation", "Gratitude"],
+    when_to_try: ["Bridging distance through virtual dining.", "Synchronizing meals over video calls.", "Designing for remote shared experiences."],
+    related: ["P003", "P010", "P001"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P013/P013_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P013/P013_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P013/P013_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P013/P013_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P013_audio.mp3",
+    emoji: "💻",
+    cardColor: "#e3f2fd"
+  },
+  P014: {
+    id: "P014",
+    title: `Accomplishing home management through cleaning tools`,
+    description: `This practice is the intentional maintenance of domestic environments or tools through routines such as vacuuming surroundings, surface wiping, and deep cleaning the appliances or tools. These actions foster a sense of accomplishment, freshness, and control, often enhanced by sensory rewards like pleasant scents and visual tidiness. Beyond creating a more enjoyable home environment, regular cleaning also promotes hygiene and extends the longevity of household items, ensuring healthier and more sustainable behavior routines. `,
+    story: `It’s a quiet Sunday morning, and soft rain nudges against your apartment window. You look at the washer, noticing that faint, sour scent again. Today is the day of the washing drum.
+You mix vinegar and baking soda in the measuring cup, watching it bubble over slightly. As the hot cycle starts, you kneel with a damp cloth and begin wiping the seals. Slow, circular motions, lifting grime from folds you’d never looked at closely before.
+In this stillness, you start to notice how long this machine has been there for you. How it spun through mornings when you were late, carried mud-soaked socks after hikes, freshened your sheets when nothing else felt clean. Now the drum shines, catching the overhead light like polished silver. `,
+    effects: `Cleaning has become a simple yet satisfying habit that fosters a sense of accomplishment, relaxation, and routine, making the space feel refreshed while also providing a small moment of self-care and focus.`,
+    context: "Cleaning",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality"],
+    emotions: ["Satisfaction", "Confidence"],
+    when_to_try: ["Designing for satisfying tool maintenance.", "Enhancing the feeling of order.", "Visualizing cleaning progress and rewards."],
+    related: ["P003", "P017", "P015"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P014/P014_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P014/P014_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P014/P014_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P014/P014_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P014_audio.mp3",
+    emoji: "🧹",
+    cardColor: "#fdf8e1"
+  },
+  P015: {
+    id: "P015",
+    title: `Cleaning as my love language`,
+    description: `Cleaning for others sometimes serves as an act of care and service, where maintaining a tidy space benefit loved ones and contributes to household harmony. Whether washing dishes, mopping, or vacuuming a shared or other's space, these actions express consideration for others while also bringing personal satisfaction. The process fosters moments of reflection, quiet absorption, and pride in creating a comfortable and welcoming environment. This practice can reflect the management of household resources and a commitment to shared well-being, contributing to a more sustainable and harmonious home life. `,
+    story: `The afternoon light is fading, and the house holds that in-between stillness before your mother comes home. You picture your mother coming home, tired again after a long day.
+She didn’t ask, but you just started to tidy up by putting scattered clothes and books back in place. Then you vacuum and run it along the corners and under the coffee table, which is her favorite spot in the house.
+As the vacuum hum fills the air, you imagine this clean home will greet her. The thought brings a gentle smile. `,
+    effects: `Completing the practice of cleaning and vacuuming brings me a sense of accomplishment, reduces stress, and fosters mindfulness, making my home feel more relaxed and meaningful, similar to the satisfaction of making my bed.`,
+    context: "Cleaning",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism"],
+    emotions: ["Satisfaction", "Relaxation", "Confidence"],
+    when_to_try: ["Expressing care through tidy spaces.", "Designing for acts of service.", "Surprising loved ones with cleanliness."],
+    related: ["P018", "P007", "P016"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P015/P015_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P015/P015_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P015/P015_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P015/P015_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P015_audio.mp3",
+    emoji: "❤️",
+    cardColor: "#e8f5e9"
+  },
+  P016: {
+    id: "P016",
+    title: `Co-cleaning with others makes it easy`,
+    description: `Cleaning becomes more enjoyable and effortless when shared with others, whether through dividing chores, small acts of help, or simply creating a positive atmosphere with music and rituals. These shared moments foster gratitude, connection, and a sense of teamwork, transforming routine tasks into meaningful and supportive experiences. By reducing individual burden, enhancing household cooperation, and encouraging mutual responsibility for shared spaces, co-cleaning practices reflect a socially embedded form of domestic sustainable routines.  `,
+    story: `On Sunday morning, you crack open a window. The sunshine is soft, and cool air slips in.
+Your partner appears in the doorway with the vacuum cleaner in one hand and a sleepy smile. Your dog trots behind the vacuum, tail already wagging.
+A familiar beat fills the room as you vacuum the floors. Your partner wipes and finishes the remnants along you. Your dog brings you a sock from under the couch. You and your partner laugh at seeing each other. There’s no need for words. It’s all in the rhythm now.  `,
+    effects: `After completing the cleaning, it fulfilled my expectation by creating a calm, organized space, reducing stress, and providing a sense of accomplishment, ultimately enhancing my well-being and focus while becoming an essential part of my self-care routine.`,
+    context: "Cleaning",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism"],
+    emotions: ["Satisfaction", "Gratitude", "Anticipation", "Pleasant surprise"],
+    when_to_try: ["Gamifying shared household chores.", "Designing for cleaning teamwork rhythm.", "Turning chores into bonding moments."],
+    related: ["P006", "P015", "P019"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P016/P016_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P016/P016_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P016/P016_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P016/P016_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P016_audio.mp3",
+    emoji: "🤝",
+    cardColor: "#fffde7"
+  },
+  P017: {
+    id: "P017",
+    title: `Calming my mind with repetitive tasks`,
+    description: `Engaging in simple, repetitive clothing-related tasks, such as sewing or sorting laundry, as a way to quiet the mind and maintain focus. Often performed alone or in the background of other activities, these tasks provide a calming, meditative rhythm that supports mental relaxation and order. Beyond their calm rhythm, these acts often extend the life of garments, avoiding waste, or maintaining shared spaces. Doing so embodies small but influential forms of conscious care for oneself, one’s surroundings, and sustainability. `,
+    story: `In the late afternoon, you begin taking the crispy laundry out of the dryer when you hear a soft melody. Clink, something has dropped. You spot a button, fallen from your favorite jeans.
+Gently, you set the rest of the laundry down in the basket and begin a quiet bit of mending. You sit cross-legged, a needle and thread in your hands. In, out, pull. The fabric gives gently under your fingers, the tiny stitches lining up one by one.
+You breathe slower and focus sharpens. When you finish, you smooth the repaired fabric between your palms. `,
+    effects: `Over time, these tasks transformed into a calming and meditative practice, fostering a sense of comfort, mindfulness, and emotional connection to the process.`,
+    context: "Clothing Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology"],
+    emotions: ["Satisfaction", "Pride", "Relaxation", "Gratitude"],
+    when_to_try: ["Encouraging mindful mending moments.", "Designing for focus in repetition.", "Supporting quiet, hands-on restoration."],
+    related: ["P024", "P015", "P014"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P017/P017_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P017/P017_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P017/P017_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P017/P017_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P017_audio.mp3",
+    emoji: "🧵",
+    cardColor: "#f3e5f5"
+  },
+  P018: {
+    id: "P018",
+    title: `Laundry with love`,
+    description: `This practice captures emotionally resonant practices like doing laundry or ironing for others or together as acts of care, continuity, and connection. Whether performing a family's traditional laundry know-how, keeping using garments or ironing tools with sentimental value, or simply creating a fresh laundry space for loved ones, these activities blend responsibility with affection. The sensory rewards of soft fabric, fresh scent, or a crisp finish enhance positive emotions, while the underlying actions reflect mindful maintenance and longer use of tools or clothes, continuing a sustainable ritual through love and intention. `,
+    story: `You toss your laundry basket onto the floor and gather the piles of shirts, towels, and jeans. As you sort through the pile, you glance at the hallway and remember that your parents are working late today.
+You pause, then gather every family member's laundry too. You are folding them into your arms with a small grin. When you load the washer, the detergent's fresh scent swirls up, which is your family's favorite scent. A low hum fills the room.
+You sit on the sofa, feeling oddly grounded. You smile, imagining this may be a simple present for them. `,
+    effects: `This practice can be a way to contribute to the household, fostering a sense of responsibility, fulfillment, and emotional connection.`,
+    context: "Clothing Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Pride", "Relaxation", "Anticipation"],
+    when_to_try: ["Framing laundry as family care.", "Enhancing the scent of home.", "Designing for sentimental garment care."],
+    related: ["P007", "P015", "P019"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P018/P018_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P018/P018_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P018/P018_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P018/P018_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P018_audio.mp3",
+    emoji: "👕",
+    cardColor: "#fdecea"
+  },
+  P019: {
+    id: "P019",
+    title: `Folding clothes, weaving conversations`,
+    description: `Folding clothes accompanied by music or shared conversations is a reflective and often relational ritual, where quiet moments of tactile repetition are enriched by music, mindfulness, and loved ones. When done with loved ones, it becomes a moment of connection, turning household chores into opportunities for bonding and storytelling. This can partially help shape sustainable habits by extending the care and longevity of clothing with resource awareness. `,
+    story: `The dryer's gentle melody lets you know the laundry is done. The basket of warm laundry sits between you and your mom.
+Sitting side by side on the living room floor, you and your mom start folding them together. You trade secrets about ironing stubborn wrinkles, laugh together over mismatched socks, and sometimes just fall into comfortable silences.
+Your little things spill out easily like stories from work, small memories, and funny episodes you hadn't thought to share until now. You feel that you and your mom seem to talk more than at any other moment. `,
+    effects: `The practice can be a way to bond, share conversations, and create meaningful connections at the same time, the rhythmic and tactile experience of folding provided stress relief, relaxation, and a sense of accomplishment.`,
+    context: "Clothing Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism", "Equity"],
+    emotions: ["Relaxation", "Satisfaction", "Confidence", "Energetic"],
+    when_to_try: ["Facilitating conversation while folding.", "Designing for shared laundry time.", "Turning chores into social connection."],
+    related: ["P018", "P016", "P013"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P019/P019_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P019/P019_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P019/P019_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P019/P019_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P019_audio.mp3",
+    emoji: "🗣️",
+    cardColor: "#fff3e0"
+  },
+  P020: {
+    id: "P020",
+    title: `Collaborative air care`,
+    description: `This practice is a shared action of maintaining and improving indoor air quality through cooperative rituals. For example, this could be taking turns refilling water for humidifiers, co-selecting candles, or adopting air care habits from others. This ritual fosters a sense of teamwork and connection while reinforcing mutual responsibility within shared spaces. The practice can partly nurture ecological and communal consciousness by collaboratively reducing toxins or allergens and managing a healthy shared environment together. `,
+    story: `In the evening, you feel the radiator humming with dried air inside. You find the shared humidifier’s light blinking red.
+Without a word, you refill the reservoir and add a drop of lavender oil. You're smiling to know your roommate will also like this mood. Somehow, you just notice that your shared room always feels fragrant and tidy.
+Even on snowy days when you came home with wet feet, you felt grateful that your roommate’s considerate room management with favorite woody oil always kept the room warm and fragrant. You grin because now you can fully understand why your room is always comfortable. `,
+    effects: `The experience can become a meaningful self-care and bonding practice, fostering emotional comfort, relaxation, and mindfulness. The ritual now signals rest and well-being, creating a calming atmosphere and enhancing interpersonal connections.`,
+    context: "Air Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism", "Equity"],
+    emotions: ["Relaxation", "Satisfaction", "Gratitude", "Sympathy"],
+    when_to_try: ["Managing shared air quality together.", "Designing for cooperative environment care.", "Syncing preferences for shared comfort."],
+    related: ["P016", "P021", "P006"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P020/P020_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P020/P020_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P020/P020_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P020/P020_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P020_audio.mp3",
+    emoji: "💨",
+    cardColor: "#e3f2fd"
+  },
+  P021: {
+    id: "P021",
+    title: `Sharing fresh air with others`,
+    description: `Sharing air-enhancing products with others, such as humidifiers or air purifiers, could be a way to create social moments and connect with others. Whether improving air quality for loved ones, easing allergies together, or sparking conversations in shared spaces, these interactions transform air care into a subtle yet meaningful act of consideration, fostering both comfort and connection. These gestures reflect both self-care and interpersonal care, maintaining shared indoor environments efficiently, and reflecting mindful and collective attention to comfort and health. `,
+    story: `Every night before bed, you and your partner turn on the air purifier for your partner's allergies.
+You both settle under the covers, listening as the purifier draws in the room and exhales it clean. Within minutes, you can feel the air feel lighter and clearer. After using the air purifier recommended by your mother, both you and your partner can notice the difference in breathing and air quality.
+You appreciate the way your partner can breathe smoothly. You also feel as though you may sleep better with its humming sound as a sign of the air cycle in your room. `,
+    effects: `The practice can become a meaningful practice of shared care, enhancing both personal health (e.g., allergy relief, better sleep) and emotional connection with others. The act now provides comfort, improved physical well-being, and moments of togetherness.`,
+    context: "Air Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism", "Equity"],
+    emotions: ["Relaxation", "Respect", "Enchantment", "Kindness"],
+    when_to_try: ["Caring for others' air health.", "Designing for shared respiratory comfort.", "Enhancing sleep through shared air."],
+    related: ["P020", "P024", "P005"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P021/P021_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P021/P021_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P021/P021_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P021/P021_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P021_audio.mp3",
+    emoji: "🌬️",
+    cardColor: "#e8f5e9"
+  },
+  P022: {
+    id: "P022",
+    title: `Enjoying a walk/run while focusing on myself`,
+    description: `Taking a walk or run could be a personal positive practice to clear the mind, reflect, and reconnect with oneself. This involves moving through a quiet park, listening to the rhythm of footsteps, or feeling the fresh air. The practice enhances mental clarity, boosts mood, and fosters a sense of accomplishment. These mindful movements create space for gratitude, self-care, and a refreshing reset in the midst of daily life. It fosters a nurturing lifestyle both in body and mind with minimal equipment or cost. `,
+    story: `The morning air is still cool. You lace up your sneakers and tuck earbuds in. You choose a playlist and step onto the quiet street.
+You match your steps with the soft rhythm of your favorite music. While walking, you see the trees sway in a breeze and catch a squirrel dart across the grass. You are smiling without even noticing.
+When you keep moving, you focus on yourself by better feeling your body warmth and the cool air on your fingertips. When you get back home, you feel there’s no need to turn on the heater because of your heat. `,
+    effects: `This experience can become a valued personal ritual that offers both physical and mental benefits. The routine now provides calmness, reflection, a sense of accomplishment, and emotional release, promoting a balanced, grounded start to the day.`,
+    context: "Personal Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Proecology"],
+    emotions: ["Satisfaction", "Energetic", "Confidence", "Relaxation"],
+    when_to_try: ["Designing for rhythmic solo movement.", "Connecting with self through walking.", "Enhancing outdoor personal reflection."],
+    related: ["P024", "P010", "P023"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P022/P022_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P022/P022_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P022/P022_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P022/P022_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P022_audio.mp3",
+    emoji: "🏃",
+    cardColor: "#fdf8e1"
+  },
+  P023: {
+    id: "P023",
+    title: `Physical activities with a sense of love and deeper connection`,
+    description: `The practice is about engaging in physical activities with others. For example, walking a dog, jogging with a partner, or going to the gym with a friend can be a way to refresh the mind and body, while naturally fostering moments of connection. The presence of others (e.g., pets, family members, or fellow joggers) may add warmth and meaning, making the activity more fulfilling and memorable. Whether through casual conversations, mutual encouragement, or simply sharing space, these interactions enhance enjoyment and amplify positive emotions. The act of moving side by side may foster mutual encouragement and emotional replenishment, turning everyday behaviors into social nurturing activities. `,
+    story: `In the morning, you and your roommate lace up your shoes by the door. Your roommate adjusts their sweatshirt and gives a small nod. Then the two of you begin jogging in sync.
+As the leaves overhead flicker with morning light, you and your roommate talk about an upcoming deadline and things that have been quietly weighing on you. You laugh together over small but funny moments from school and a party you’re both looking forward to.
+Back home, your roommate heads to the coffee maker. While brewing coffee, you both enjoy warm energy and ease your heart rate. `,
+    effects: `The practice can become a cherished practice that strengthens emotional ties (e.g., with pets, with a partner), encourages reflection, and promotes both mental calmness and physical health. The activity now offers fulfillment, joy, and a deeper sense of connection with nature and companions.`,
+    context: "Personal Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Altruism"],
+    emotions: ["Relaxation", "Love", "Satisfaction", "Amusement"],
+    when_to_try: ["Designing for shared active bonding.", "Syncing rhythms with a partner.", "Encouraging social physical refreshment."],
+    related: ["P022", "P021", "P008"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P023/P023_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P023/P023_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P023/P023_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P023/P023_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P023_audio.mp3",
+    emoji: "🐕",
+    cardColor: "#fffde7"
+  },
+  P024: {
+    id: "P024",
+    title: `Having self-reflection time through gentle rhythm of hands`,
+    description: `Engaging in repetitive, hands-on activities (e.g., cross-stitching, grinding coffee beans, or tidying up) is a way to enjoy slowing down and reflecting in the present moment. The daily practices with rhythmic motion of the hands foster a sense of mindfulness, easing anxiety while allowing thoughts to flow freely. These small, intentional actions turn routine moments into opportunities for self-connection, relaxation, and appreciation of simple pleasures. By choosing slower, manual routines over fast or energy-intensive alternatives, the practice may support a more frugal and sustainable way of living. `,
+    story: `The evening light filters through your window. You settle into your favorite couch and place a bundle of soft yarn on your lap. You have lately started knitting for your friend's birthday gift.
+With a comforting show as background, you carefully watch each stitch take shape, adding color and form. Your hands steadily guide the needle as you build each small section. As your fingers find their rhythm, the sound from the show fades into the background.
+You are drifting through moments from the day and some memories with the friend who will receive this gift. Immersing yourself in your hands' rhythm, a smile tugs at your lips before you even realize it. `,
+    effects: `These repetitive actions now serve as anchors for relaxation and reflection, providing a deeper connection to simple, everyday moments. Fostering mindfulness, emotional clarity, and grounding.`,
+    context: "Personal Care",
+    tag_wellbeing: ["Feel enjoyable and meaningful"],
+    tag_sustainability: ["Frugality", "Altruism", "Equity"],
+    emotions: ["Satisfaction", "Relaxation", "Love", "Gratitude"],
+    when_to_try: ["Designing for rhythmic manual hobbies.", "Encouraging flow through handiwork.", "Slowing down with tactile tasks."],
+    related: ["P001", "P017", "P022"],
+    illustration_main_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P024/P024_1.png",
+    illustration_sub1_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P024/P024_2.png",
+    illustration_sub2_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P024/P024_3.png",
+    illustration_sub3_url: "https://raw.githubusercontent.com/GaeulHan457/toolkit-images/main/illust_main/P024/P024_4.png",
+    audio_url: "https://gaeulhan457.github.io/toolkit-images/audio/P024_audio.mp3",
+    emoji: "🧶",
+    cardColor: "#f3e5f5"
+  },
+};
+
+const cardOrder = ["P001","P002","P003","P004","P005","P006","P007","P008","P009","P010","P011","P012","P013","P014","P015","P016","P017","P018","P019","P020","P021","P022","P023","P024"];
+
+const allPractices = [
+  { id:"P001", title:`Diving into a sense of immersion with ingredients`, context:"Cooking", emoji:"🥗", cardColor:"#fffbe6" },
+  { id:"P002", title:`Making a nourishing gift for myself`, context:"Cooking", emoji:"🥤", cardColor:"#fff3e0" },
+  { id:"P003", title:`Enjoying super convenient cooking`, context:"Cooking", emoji:"🍜", cardColor:"#fdecea" },
+  { id:"P004", title:`Exploring new flavors & having my own special recipe`, context:"Cooking", emoji:"🍳", cardColor:"#e8f5e9" },
+  { id:"P005", title:`Sharing good tasty or scent moments with others`, context:"Cooking", emoji:"☕", cardColor:"#fdf8e1" },
+  { id:"P006", title:`Kitchen teamwork - we are a team!`, context:"Cooking", emoji:"👩‍🍳", cardColor:"#e3f2fd" },
+  { id:"P007", title:`Feeling connected by cooking for others`, context:"Cooking", emoji:"💛", cardColor:"#fffde7" },
+  { id:"P008", title:`Cooking with other's know-how and memory`, context:"Cooking", emoji:"📖", cardColor:"#f3e5f5" },
+  { id:"P009", title:`Feeling love through other's cooking/repairing machines`, context:"Cooking", emoji:"🌿", cardColor:"#e8f5e9" },
+  { id:"P010", title:`A warm and aromatic pause before beginning of new day`, context:"Cooking", emoji:"☕", cardColor:"#fff3e0" },
+  { id:"P011", title:`Don't miss the sensational first sip/bite!`, context:"Cooking", emoji:"🍞", cardColor:"#fdecea" },
+  { id:"P012", title:`Enjoying other's expressions to my shared cooking`, context:"Cooking", emoji:"🫕", cardColor:"#e8f5e9" },
+  { id:"P013", title:`No matter the distance, sharing tasty moments by online dining`, context:"Cooking", emoji:"💻", cardColor:"#e3f2fd" },
+  { id:"P014", title:`Accomplishing home management through cleaning tools`, context:"Cleaning", emoji:"🧹", cardColor:"#fdf8e1" },
+  { id:"P015", title:`Cleaning as my love language`, context:"Cleaning", emoji:"❤️", cardColor:"#e8f5e9" },
+  { id:"P016", title:`Co-cleaning with others makes it easy`, context:"Cleaning", emoji:"🤝", cardColor:"#fffde7" },
+  { id:"P017", title:`Calming my mind with repetitive tasks`, context:"Clothing Care", emoji:"🧵", cardColor:"#f3e5f5" },
+  { id:"P018", title:`Laundry with love`, context:"Clothing Care", emoji:"👕", cardColor:"#fdecea" },
+  { id:"P019", title:`Folding clothes, weaving conversations`, context:"Clothing Care", emoji:"🗣️", cardColor:"#fff3e0" },
+  { id:"P020", title:`Collaborative air care`, context:"Air Care", emoji:"💨", cardColor:"#e3f2fd" },
+  { id:"P021", title:`Sharing fresh air with others`, context:"Air Care", emoji:"🌬️", cardColor:"#e8f5e9" },
+  { id:"P022", title:`Enjoying a walk/run while focusing on myself`, context:"Personal Care", emoji:"🏃", cardColor:"#fdf8e1" },
+  { id:"P023", title:`Physical activities with a sense of love and deeper connection`, context:"Personal Care", emoji:"🐕", cardColor:"#fffde7" },
+  { id:"P024", title:`Having self-reflection time through gentle rhythm of hands`, context:"Personal Care", emoji:"🧶", cardColor:"#f3e5f5" },
+];
+allPractices.forEach(p => { if (practices[p.id]) Object.assign(p, practices[p.id]); });
+
+// ─── SHUFFLE HELPER ───────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ─── HERO FILTER ──────────────────────────────────────────────────────
+function runHeroFilter() {
+  const everyday = ddState.everyday;   // e.g. 'positive cooking' or null
+  const act      = ddState.act;        // e.g. 'frugal' or null
+
+  const everydayMap = {
+    'positive everyday':      null,
+    'positive cooking':       'cooking',
+    'positive cleaning':      'cleaning',
+    'positive clothing care': 'clothing care',
+    'positive personal care': 'personal care',
+    'positive indoor air care': 'air care',
+  };
+  const actMap = {
+    'responsible':    null,
+    'frugal':         'frugal',
+    'pro-ecological': 'proecology',
+    'altruistic':     'altruism',
+    'equitable':      'equity',
+  };
+
+  // Filter allPractices
+  const filtered = allPractices.filter(p => {
+    const context   = (p.context || '').toLowerCase();
+    const sustain   = (p.tag_sustainability || []).join(' ').toLowerCase();
+
+    if (everyday) {
+      const contextFilter = everydayMap[everyday.toLowerCase()];
+      if (contextFilter && context !== contextFilter.toLowerCase()) return false;
+    }
+    if (act) {
+      const actFilter = actMap[act.toLowerCase()];
+      if (actFilter) {
+        if (!sustain.includes(actFilter)) return false;
+      } else {
+        const allKeywords = ['frugal', 'proecology', 'altruism', 'equity'];
+        if (!allKeywords.some(kw => sustain.includes(kw))) return false;
+      }
+    }
+    return true;
+  });
+
+  // Sync explore page dropdowns to match home selections
+  if (everyday) {
+    ddState2.everyday = everyday;
+    const el = document.getElementById('ddLabelEveryday2');
+    if (el) el.textContent = everyday;
+  }
+  if (act) {
+    ddState2.act = act;
+    const al = document.getElementById('ddLabelAct2');
+    if (al) al.textContent = act;
+    const panel2 = document.getElementById('ddPanelAct2');
+    if (panel2) {
+      panel2.querySelectorAll('.dd-sub-opt,.dd-main-opt').forEach(b =>
+        b.classList.toggle('selected', b.textContent.trim() === act));
+    }
+  }
+
+  // Switch to explore page and show filtered results
+  switchTo('explorePage');
+
+  const grid = document.getElementById('exploreGrid');
+  grid.innerHTML = '';
+
+  // "positive everyday" and "responsible" are the catch-all defaults → treat as no filter
+  const everydayIsDefault = !everyday || everyday.toLowerCase() === 'positive everyday';
+  const actIsDefault = !act || act.toLowerCase() === 'responsible';
+  const hasRealFilter = !everydayIsDefault || !actIsDefault;
+
+  const countEl = document.getElementById('exploreCount');
+  if (!hasRealFilter) {
+    countEl.textContent = `Showing all ${allPractices.length} practices`;
+    buildExploreGrid();
+    return;
+  }
+
+  const shuffled = shuffle(filtered);
+  countEl.textContent = `${shuffled.length} practice${shuffled.length !== 1 ? 's' : ''} found`;
+
+  if (shuffled.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#8a7f72;font-size:15px">
+      No practices match your selection.<br><span style="font-size:13px;opacity:0.7">Try adjusting the filters above.</span>
+    </div>`;
+    return;
+  }
+
+  shuffled.forEach((p, i) => {
+    const hasDetail = !!practices[p.id];
+    const card = document.createElement('div');
+    card.className = 'explore-card' + (hasDetail ? '' : ' placeholder');
+    card.style.animationDelay = (i * 30) + 'ms';
+    if (hasDetail) card.onclick = () => showDetail(p.id);
+    card.innerHTML = `
+      <div class="explore-card-label">${p.title}</div>
+      <div class="explore-card-img" style="background:#ffffff">
+        ${p.illustration_main_url
+          ? `<img src="${p.illustration_main_url}" alt="${p.title}">`
+          : `<span>${p.emoji}</span>`}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ─── HELPERS ───────────────────────────────────────────────────────────
+function getCardBg(id) {
+  const colors = { P001:'#fffbe6', P010:'#fff3e0', P011:'#fdecea', P012:'#e8f5e9' };
+  return colors[id] || '#f0ece4';
+}
+
+function allPageIds() { return ['homePage','explorePage','detailPage','howToUsePage','aboutPage']; }
+
+function switchTo(pageId) {
+  allPageIds().forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo({ top: 0 });
+}
+
+// ─── NAV ───────────────────────────────────────────────────────────────
+function goHome()      { switchTo('homePage'); }
+function showHowToUse(){ switchTo('howToUsePage'); }
+function showAbout()   { switchTo('aboutPage'); }
+
+function showExplorePage() {
+  switchTo('explorePage');
+  // Restore label UI from ddState2 before filtering
+  if (ddState2.everyday) {
+    const el = document.getElementById('ddLabelEveryday2');
+    if (el) el.textContent = ddState2.everyday;
+  }
+  if (ddState2.act) {
+    const al = document.getElementById('ddLabelAct2');
+    if (al) al.textContent = ddState2.act;
+  }
+  // Always run filter (it handles default/all cases internally)
+  runExploreFilter();
+}
+
+function scrollToCards() { showExplorePage(); }
+
+// ─── BUILD HOME CARDS ──────────────────────────────────────────────────
+function buildCards() {
+  const track = document.getElementById('cardsTrack');
+  if (!track) return;
+  track.innerHTML = '';
+  cardOrder.forEach(id => {
+    const p = practices[id];
+    const card = document.createElement('div');
+    card.className = 'practice-card';
+    card.onclick = () => showDetail(id);
+    card.innerHTML = `
+      <div class="card-label">${p.title}</div>
+      <div class="card-img-placeholder" style="background:${getCardBg(id)}">
+        ${p.illustration_main_url
+          ? `<img src="${p.illustration_main_url}" alt="${p.title}">`
+          : `<span style="font-size:52px">${p.emoji}</span>`}
+      </div>`;
+    track.appendChild(card);
+  });
+}
+
+function scrollCards(dir) {
+  document.getElementById('cardsTrack').scrollBy({ left: dir * 260, behavior: 'smooth' });
+}
+
+// ─── EXPLORE GRID ──────────────────────────────────────────────────────
+function buildExploreGrid() {
+  const grid = document.getElementById('exploreGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  document.getElementById('exploreCount').textContent = `Showing all ${allPractices.length} practices`;
+  allPractices.forEach((p, i) => {
+    const hasDetail = !!practices[p.id];
+    const card = document.createElement('div');
+    card.className = 'explore-card' + (hasDetail ? '' : ' placeholder');
+    card.style.animationDelay = (i * 30) + 'ms';
+    if (hasDetail) card.onclick = () => showDetail(p.id);
+    card.innerHTML = `
+      <div class="explore-card-label">${p.title}</div>
+      <div class="explore-card-img" style="background:#ffffff">
+        ${p.illustration_main_url
+          ? `<img src="${p.illustration_main_url}" alt="${p.title}">`
+          : `<span>${p.emoji}</span>`}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ─── DETAIL PAGE ───────────────────────────────────────────────────────
+function showDetail(id) {
+  const p = practices[id];
+  if (!p) return;
+
+  const fromExplore = document.getElementById('explorePage').classList.contains('active');
+
+  const relatedIds = (p.related || []).filter(rid => practices[rid]).slice(0, 3);
+  const relatedHTML = relatedIds.map(rid => {
+    const rp = practices[rid];
+    return `<div class="related-card" onclick="showDetail('${rid}')">
+      <div class="related-card-label">${rp.title}</div>
+      <div class="related-card-img" style="background:${getCardBg(rid)}">
+        ${rp.illustration_main_url ? `<img src="${rp.illustration_main_url}" alt="${rp.title}">` : `<span>${rp.emoji}</span>`}
+      </div></div>`;
+  }).join('');
+
+  const wellbeingTags = (p.tag_wellbeing || []).map(t => `<span class="tag wellbeing">${t}</span>`).join('');
+  const sustainTags = (p.tag_sustainability || []).map(t => `<span class="tag sustainability">${t}</span>`).join('');
+  const emotionChips = (() => {
+    const ems = p.emotions || [];
+    let rows = '';
+    for (let i = 0; i < ems.length; i += 2) {
+      const pair = ems.slice(i, i+2).map(e => `<span class="emotion-chip">✦ ${e}</span>`).join('');
+      rows += `<div style="display:flex;gap:8px;margin-bottom:8px;justify-content:center">${pair}</div>`;
+    }
+    return rows;
+  })();
+  const storyParas = (p.story || '').split('\n\n').filter(s => s.trim()).map(s => `<p style="margin-bottom:22px">${s.trim()}</p>`).join('');
+  const whenItems = (p.when_to_try || []).map(w => `<li>${w}</li>`).join('');
+  const backLabel = fromExplore ? 'Back to all practices' : 'Back';
+  const backFn = fromExplore ? 'showExplorePage()' : 'goHome()';
+
+  document.getElementById('detailContent').innerHTML = `
+    <button class="back-btn" onclick="${backFn}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>${backLabel}</span>
+    </button>
+    <div class="detail-layout">
+      <!-- LEFT: title / desc / tags / story -->
+      <div class="detail-left-col">
+        <h1 class="detail-title">${p.title}</h1>
+
+        <!-- EMBEDDED AUDIO PLAYER -->
+        ${p.audio_url ? `
+        <div style="margin-top:16px; margin-bottom:28px; background:#ffffff; border:1.5px solid #e8d9c4; border-radius:16px; padding:16px 20px; max-width:420px;">
+          <div style="font-size:10px; color:#8a7f72; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#5c3d1e" stroke-width="1"/><polygon points="5.5,4 10.5,7 5.5,10" fill="#5c3d1e"/></svg>
+            AI Deep Dive
+          </div>
+          <div style="font-size:13px; font-weight:600; color:#2c2c2c; line-height:1.35; margin-bottom:12px;">90-Second Audio Summary</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <span id="apCurrentTime" style="font-size:11px;color:#8a7f72;min-width:32px">0:00</span>
+            <div id="apProgressBar" style="flex:1;height:4px;background:#e8e2d8;border-radius:4px;cursor:pointer;position:relative" onclick="apSeek(event)">
+              <div id="apProgressFill" style="height:100%;width:0%;background:#6b8f5e;border-radius:4px;transition:width 0.1s linear"></div>
+            </div>
+            <span id="apDuration" style="font-size:11px;color:#8a7f72;min-width:32px;text-align:right">–:––</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+            <button onclick="apSkip(-10)" title="-10s"
+              style="background:none;border:1px solid #d6cfc4;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#5a5547;flex-direction:column;gap:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+              <span style="font-size:8px;margin-top:1px">10</span>
+            </button>
+            <button id="apPlayBtn" onclick="apTogglePlay()"
+              style="background:#2c2c2c;border:none;border-radius:50%;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:background 0.2s">
+              <svg id="apPlayIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+            <button onclick="apSkip(10)" title="+10s"
+              style="background:none;border:1px solid #d6cfc4;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#5a5547;flex-direction:column;gap:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/></svg>
+              <span style="font-size:8px;margin-top:1px">10</span>
+            </button>
+          </div>
+          <audio id="practiceAudio" src="${p.audio_url}" preload="auto"></audio>
+        </div>
+        ` : ''}
+
+        <p class="detail-body">${p.description}</p>
+        <div class="tags-section">
+          <h3>Tags</h3>
+          <div class="tags-wrap">${wellbeingTags}${sustainTags}</div>
+        </div>
+        <div class="story-header">
+          <h3>Story</h3>
+        </div>
+        <div class="story-text">${storyParas}</div>
+      </div>
+      <!-- RIGHT: 2x2 image grid -->
+      <div class="detail-right-col">
+        <div class="story-images">
+          <div class="story-img-box" style="background:${getCardBg(id)}">
+            ${p.illustration_main_url ? `<img src="${p.illustration_main_url}" alt="main">` : `<span>${p.emoji}</span>`}
+          </div>
+          <div class="story-img-box" style="background:${getCardBg(id)}">
+            ${p.illustration_sub1_url ? `<img src="${p.illustration_sub1_url}" alt="sub1">` : `<span>${p.emoji}</span>`}
+          </div>
+          <div class="story-img-box" style="background:${getCardBg(id)}">
+            ${p.illustration_sub2_url ? `<img src="${p.illustration_sub2_url}" alt="sub2">` : `<span>${p.emoji}</span>`}
+          </div>
+          <div class="story-img-box" style="background:${getCardBg(id)}">
+            ${p.illustration_sub3_url ? `<img src="${p.illustration_sub3_url}" alt="sub3">` : `<span>${p.emoji}</span>`}
+          </div>
+        </div>
+      </div>
+    </div><!-- end detail-layout -->
+    <div class="effects-grid">
+      <div class="effect-card"><h4>Effects</h4><p>${p.effects || ''}</p></div>
+      <div class="effect-card" style="align-items:center;text-align:center"><h4>During the practice, you may feel better</h4><div style="margin-top:12px;width:100%">${emotionChips}</div></div>
+      <div class="effect-card"><h4>When might we try this practice</h4><ul>${whenItems}</ul></div>
+    </div>
+    <div class="divider"></div>
+    <div class="related-section"><h3>Related Practices</h3><div class="related-grid">${relatedHTML}</div></div>
+  `;
+
+  switchTo('detailPage');
+  document.getElementById('detailContent').classList.remove('fade-in');
+  void document.getElementById('detailContent').offsetWidth;
+  document.getElementById('detailContent').classList.add('fade-in');
+
+  // Attach audio player events for embedded player
+  const audio = document.getElementById('practiceAudio');
+  if (audio) {
+    audio.addEventListener('loadedmetadata', () => {
+      const d = audio.duration;
+      const el = document.getElementById('apDuration');
+      if (el) el.textContent = apFmtTime(d);
+    });
+    audio.addEventListener('timeupdate', () => {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      const fill = document.getElementById('apProgressFill');
+      const cur  = document.getElementById('apCurrentTime');
+      if (fill) fill.style.width = pct + '%';
+      if (cur)  cur.textContent = apFmtTime(audio.currentTime);
+    });
+    audio.addEventListener('ended', () => {
+      const icon = document.getElementById('apPlayIcon');
+      const btn  = document.getElementById('apPlayBtn');
+      if (icon) icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+      if (btn)  btn.style.background = '#2c2c2c';
+    });
+  }
+}
+
+
+function apTogglePlay() {
+  const audio = document.getElementById('practiceAudio');
+  const icon  = document.getElementById('apPlayIcon');
+  if (!audio) return;
+  if (audio.paused) {
+    audio.play();
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  } else {
+    audio.pause();
+    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+  }
+}
+
+function apSkip(sec) {
+  const audio = document.getElementById('practiceAudio');
+  if (!audio) return;
+  audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + sec));
+}
+
+function apSeek(e) {
+  const audio = document.getElementById('practiceAudio');
+  const bar   = document.getElementById('apProgressBar');
+  if (!audio || !bar) return;
+  const rect = bar.getBoundingClientRect();
+  const pct  = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = pct * (audio.duration || 0);
+}
+
+function apFmtTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ─── DROPDOWN (HOME) ───────────────────────────────────────────────────
+const ddState = { everyday: null, act: null };
+const ddConfig = {
+  everyday: { btn:'ddBtnEveryday', panel:'ddPanelEveryday', label:'ddLabelEveryday', type:'pink' },
+  act:      { btn:'ddBtnAct',      panel:'ddPanelAct',      label:'ddLabelAct',      type:'green' },
+};
+
+function toggleDropdown(key) {
+  const open = document.getElementById(ddConfig[key].panel).classList.contains('visible');
+  closeAllDropdowns();
+  if (!open) {
+    document.getElementById(ddConfig[key].panel).classList.add('visible');
+    document.getElementById(ddConfig[key].btn).classList.add('open');
+  }
+}
+function closeAllDropdowns() {
+  Object.keys(ddConfig).forEach(k => {
+    document.getElementById(ddConfig[k].panel).classList.remove('visible');
+    document.getElementById(ddConfig[k].btn).classList.remove('open');
+  });
+}
+function selectOption(key, value) {
+  ddState[key] = value;
+  document.getElementById(ddConfig[key].label).textContent = value;
+  document.getElementById(ddConfig[key].panel).querySelectorAll('.dd-sub-opt,.dd-main-opt').forEach(b =>
+    b.classList.toggle('selected', b.textContent.trim() === value));
+  closeAllDropdowns();
+  buildCards();
+  checkSearchGlow();
+}
+
+function checkSearchGlow() {
+  const allSelected = ddState.everyday && ddState.act;
+  const btn = document.querySelector('#homePage .search-trigger-btn');
+  if (btn) btn.classList.toggle('all-selected', !!allSelected);
+}
+
+// Allow "act responsibly" main button to be clickable and styled as selected
+document.querySelectorAll('.dd-main-opt').forEach(btn => {
+  btn.style.cursor = 'pointer';
+});
+
+// ─── EXPLORE PAGE FILTER ──────────────────────────────────────────────
+const ddState2 = { everyday: null, act: null };
+
+function runExploreFilter() {
+  const everydayMap = {
+    'positive everyday':      null, // show all contexts
+    'positive cooking':       'cooking',
+    'positive cleaning':      'cleaning',
+    'positive clothing care': 'clothing care',
+    'positive personal care': 'personal care',
+    'positive indoor air care': 'air care',
+  };
+  const actMap = {
+    'responsible':    null, // show all sustainability
+    'frugal':         'frugal',
+    'pro-ecological': 'proecology',
+    'altruistic':     'altruism',
+    'equitable':      'equity',
+  };
+
+  const filtered = allPractices.filter(p => {
+    const context   = (p.context || '').toLowerCase();
+    const sustain   = (p.tag_sustainability || []).join(' ').toLowerCase();
+
+    if (ddState2.everyday) {
+      const contextFilter = everydayMap[ddState2.everyday.toLowerCase()];
+      if (contextFilter && context !== contextFilter.toLowerCase()) return false;
+      // if contextFilter is null => 'positive everyday' => show all
+    }
+    if (ddState2.act) {
+      const actFilter = actMap[ddState2.act.toLowerCase()];
+      if (actFilter) {
+        if (!sustain.includes(actFilter)) return false;
+      } else {
+        // 'responsible' => any sustainability tag present
+        const allKeywords = ['frugal', 'proecology', 'altruism', 'equity'];
+        if (!allKeywords.some(kw => sustain.includes(kw))) return false;
+      }
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('exploreGrid');
+  const countEl = document.getElementById('exploreCount');
+  grid.innerHTML = '';
+
+  // "positive everyday" and "responsible" are the catch-all defaults → treat as no real filter
+  const everydayIsDefault = !ddState2.everyday || ddState2.everyday.toLowerCase() === 'positive everyday';
+  const actIsDefault = !ddState2.act || ddState2.act.toLowerCase() === 'responsible';
+  const hasRealFilter = !everydayIsDefault || !actIsDefault;
+
+  countEl.textContent = hasRealFilter
+    ? `${filtered.length} practice${filtered.length !== 1 ? 's' : ''} found`
+    : `Showing all ${allPractices.length} practices`;
+
+  const list = hasRealFilter ? shuffle(filtered) : allPractices;
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#8a7f72;font-size:15px">
+      No practices match your selection.<br><span style="font-size:13px;opacity:0.7">Try adjusting the filters above.</span>
+    </div>`;
+    return;
+  }
+
+  list.forEach((p, i) => {
+    const hasDetail = !!practices[p.id];
+    const card = document.createElement('div');
+    card.className = 'explore-card' + (hasDetail ? '' : ' placeholder');
+    card.style.animationDelay = (i * 30) + 'ms';
+    if (hasDetail) card.onclick = () => showDetail(p.id);
+    card.innerHTML = `
+      <div class="explore-card-label">${p.title}</div>
+      <div class="explore-card-img" style="background:#ffffff">
+        ${p.illustration_main_url
+          ? `<img src="${p.illustration_main_url}" alt="${p.title}">`
+          : `<span>${p.emoji}</span>`}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ─── DROPDOWN (EXPLORE) ────────────────────────────────────────────────
+const ddConfig2 = {
+  everyday: { btn:'ddBtnEveryday2', panel:'ddPanelEveryday2', label:'ddLabelEveryday2', type:'pink' },
+  act:      { btn:'ddBtnAct2',      panel:'ddPanelAct2',      label:'ddLabelAct2',      type:'green' },
+};
+function toggleDropdown2(key) {
+  const open = document.getElementById(ddConfig2[key].panel).classList.contains('visible');
+  closeAllDropdowns2();
+  if (!open) {
+    document.getElementById(ddConfig2[key].panel).classList.add('visible');
+    document.getElementById(ddConfig2[key].btn).classList.add('open');
+  }
+}
+function closeAllDropdowns2() {
+  Object.keys(ddConfig2).forEach(k => {
+    document.getElementById(ddConfig2[k].panel).classList.remove('visible');
+    document.getElementById(ddConfig2[k].btn).classList.remove('open');
+  });
+}
+function selectOption2(key, value) {
+  ddState2[key] = value;
+  document.getElementById(ddConfig2[key].label).textContent = value;
+  document.getElementById(ddConfig2[key].panel).querySelectorAll('.dd-sub-opt,.dd-main-opt').forEach(b =>
+    b.classList.toggle('selected', b.textContent.trim() === value));
+  closeAllDropdowns2();
+  runExploreFilter();
+}
+
+// ─── ACCORDION (HOW TO USE) ────────────────────────────────────────────
+function toggleAcc(id) {
+  const item = document.getElementById(id);
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('#howToUsePage .acc-item').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ─── ACCORDION (ABOUT) ────────────────────────────────────────────────
+function toggleAbout(id) {
+  const item = document.getElementById(id);
+  const wasOpen = item.classList.contains('open');
+  const parentAccordion = item.closest('.accordion');
+  parentAccordion.querySelectorAll('.acc-item').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ─── CLOSE DROPDOWNS ON OUTSIDE CLICK ─────────────────────────────────
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dd-wrap')) {
+    closeAllDropdowns();
+    closeAllDropdowns2();
+  }
+});
+
+// ─── SCROLL NAV ────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10);
+});
+
+
+// ─── TOGGLE HOME GRID ─────────────────────────────────────────────────
+function toggleHomeGrid() {
+  const grid = document.getElementById('homeGrid');
+  const arrow = document.getElementById('exploreAllArrow');
+  const isVisible = grid.classList.contains('visible');
+  if (isVisible) {
+    grid.classList.remove('visible');
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    grid.classList.add('visible');
+    arrow.style.transform = 'rotate(180deg)';
+    setTimeout(() => grid.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+}
+
+// ─── BUILD HOME FULL GRID ─────────────────────────────────────────────
+function buildHomeGrid() {
+  const grid = document.getElementById('homePracticeGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  allPractices.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'home-practice-card';
+    card.style.animationDelay = (i * 20) + 'ms';
+    card.onclick = () => showDetail(p.id);
+    card.innerHTML = `
+      <div class="card-img" style="background:${p.cardColor || '#f0ece4'}">
+        ${p.illustration_main_url
+          ? `<img src="${p.illustration_main_url}" alt="${p.title}">`
+          : `<span>${p.emoji}</span>`}
+      </div>
+      <div class="card-label">${p.title}</div>
+      <div class="card-context">${p.context}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────
+buildCards();
+buildHomeGrid();
+</script>
+</body>
+</html>
